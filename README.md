@@ -6,6 +6,8 @@
 
 EasyLRC is a web-based lyric processing tool designed to provide an intuitive and feature-rich LRC creation platform for creating, editing, and synchronizing lyric timestamps. It supports widely adopted LRC standards and is compatible with non-industry standard syntax. It integrates audio playback with synchronized preview functionality and supports parsing and exporting metadata, allowing users to easily create and modify lyric files.
 
+![Pages](EasyLRC_A_Light.png)
+
 ## Key Features
 
 - **Modern UI**: Features a modern, neumorphic UI with a lightweight and clean design, flexible layout, and mobile device compatibility.
