@@ -2,7 +2,7 @@
 
 ![ICON](icon/EasyLRC.png)
 
-### Switch Document Language [中文](README_CN.md) | [English](README.md)
+### Switch Document Language [简体中文](README_CN.md) | [English](README.md)
 
 ### Go to [EasyLRC Tool Website](https://lrc.vl-x.vip/)
 

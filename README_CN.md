@@ -2,7 +2,7 @@
 
 ![ICON](icon/EasyLRC.png)
 
-### 切换文档语言 [中文](README_CN.md) | [English](README.md)
+### 切换文档语言 [简体中文](README_CN.md) | [English](README.md)
 
 ### 前往 [EasyLRC 工具网站](https://lrc.vl-x.vip/)
 
