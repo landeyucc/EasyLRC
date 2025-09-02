@@ -88,7 +88,7 @@ EasyLRC 是一个基于 Web 的应用，无需复杂的安装步骤。您可以�
     - 为了获得最佳体验和避免潜在的浏览器安全限制（例如，文件协议下的某些API限制），建议通过本地 Web 服务器运行。
     - 您可以使用任何简单的 HTTP 服务器，例如 Python 的 `http.server` 模块：
         ```bash
-        cd /path/to/0xl_lrc
+        cd /path/to/EasyLRC
         python -m http.server 8000
         ```
     - 然后在浏览器中访问 `http://localhost:8000`。
