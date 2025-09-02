@@ -39,14 +39,14 @@ EasyLRC is a web-based lyric processing tool designed to provide an intuitive an
 ```
 #### Standard Syntax - Bilingual LRC Syntax:
 ```lrc
-[00:00.00] This is the first line of lyrics
+[00:00.00] 这是第一行
 [00:00.00] Is first line
 ```
 #### Non-standard Syntax - Bilingual LRC Syntax:
 
 ```lrc
-[00:00.00] This is the first line of lyrics / Is first line
-[00:01.00] This is the second line of lyrics / Is second line
+[00:00.00] 这是第一行 / Is first line
+[00:01.00] 这是第二行 / Is second line
 ```
 #### Non-standard Syntax - Word-by-word Parsing LRC Syntax:
 
