@@ -1,0 +1,10 @@
+[ar:测试歌手]
+[ti:双行格式测试]
+[00:05.00]这是第一行歌词
+[00:05.00]This is the first line translation
+[00:10.00]这是第二行歌词
+[00:10.00]This is the second line translation
+[00:15.00]这是第三行歌词 / 这是斜杠分隔的翻译
+[00:20.00]这是第四行歌词
+[00:25.00]这是第五行歌词
+[00:25.00]This is the fifth line translation

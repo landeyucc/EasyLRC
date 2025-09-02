@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyLRC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="shortcut icon" href="icon/EasyLRC.png" type="image/x-icon" sizes="16x16 32x32 64x64">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>EasyLRC</h1>
+            <p>轻松制作同步歌词，支持逐行和逐字模式</p>
+        </header>
+
+        <!-- 原编辑界面 -->
+        <main id="edit-interface">
+            <!-- 左侧输入区域 -->
+            <section class="input-panel">
+                <div class="card">
+                    <h2>音频文件</h2>
+                    <div class="audio-upload">
+                        <label for="audio-upload" class="upload-label">
+                            <i class="fas fa-music"></i>
+                            <span>上传音频文件</span>
+                        </label>
+                        <input type="file" id="audio-upload" accept="audio/*">
+                        <audio id="audio-player" controls hidden></audio>
+                        <!-- 自定义音频播放器 -->
+                        <div class="custom-audio-player" id="main-audio-player">
+                            <div class="audio-progress-bar">
+                                <div class="progress-track">
+                                    <div class="progress-fill"></div>
+                                    <div class="progress-handle"></div>
+                                </div>
+                                <div class="time-display">
+                                    <span class="current-time">00:00.00</span>
+                                    <span class="separator">/</span>
+                                    <span class="total-time">00:00.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>歌词输入</h2>
+                    <div class="lyric-input-options">
+                        <button id="text-input-btn" class="option-btn active">文本输入</button>
+                        <button id="lrc-upload-btn" class="option-btn">导入LRC</button>
+                    </div>
+                    
+                    <div id="text-input-container">
+                        <div class="bilingual-switch">
+                            <label class="switch">
+                                <input type="checkbox" id="bilingual-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="switch-label">启用双语歌词</span>
+                            <span class="tooltip-icon" title="启用后：文本输入将单数行作为歌词，双数行作为翻译；导入LRC时将识别"/"后的内容或双行格式作为翻译"><i class="fas fa-question-circle"></i></span>
+                        </div>
+                        <textarea id="lyric-textarea" placeholder="在此输入歌词，将按空格、逗号和句号自动分割...&#10;启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）"></textarea>
+                        <button id="split-lyric-btn" class="action-btn">分割歌词</button>
+                    </div>
+                    
+                    <div id="lrc-upload-container" class="hidden">
+                        <label for="lrc-upload" class="upload-label">
+                            <i class="fas fa-file-import"></i>
+                            <span>上传LRC文件</span>
+                        </label>
+                        <input type="file" id="lrc-upload" accept=".lrc">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 右侧预览和处理区域 -->
+            <section class="preview-panel">
+                <!-- 打节奏控制区域 -->
+                <div class="card" id="timing-controls">
+                    <h2>打节奏控制</h2>
+                    <div class="process-mode-container">
+                        <h3>处理模式</h3>
+                        <div class="mode-options">
+                            <label class="mode-label">
+                                <input type="radio" name="process-mode" value="line" checked>
+                                <span>逐行处理</span>
+                            </label>
+                            <label class="mode-label">
+                                <input type="radio" name="process-mode" value="char">
+                                <span>逐字处理</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="timing-navigation">
+                        <button id="stop-btn" class="control-btn"><i class="fas fa-undo"></i> 重置</button>
+                        <button id="prev-lyric" class="control-btn"><i class="fas fa-step-backward"></i> 上一条</button>
+                        <button id="next-lyric" class="control-btn"><i class="fas fa-step-forward"></i> 下一条</button>
+                    </div>
+                    
+                    <div class="lyric-context">
+                        <div class="previous-lyric">
+                            <span id="prev-lyric-label">上一歌词: </span>
+                            <span id="previous-lyric-text"></span>
+                        </div>
+                        <div class="current-lyric highlight">
+                            <span id="current-lyric-label">当前处理: </span>
+                            <span id="current-lyric-text"></span>
+                        </div>
+                        <div class="next-lyric">
+                            <span id="next-lyric-label">下一歌词: </span>
+                            <span id="next-lyric-text"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="timing-buttons">
+                        <button id="prev-5s" class="control-btn"><i class="fas fa-backward-step"></i> 后退2秒</button>
+                        <button id="next-5s" class="control-btn"><i class="fas fa-forward-step"></i> 前进2秒</button>
+                        <button id="play-pause" class="control-btn primary"><i class="fas fa-play"></i> 播放/暂停</button>
+                        <button id="set-time" class="control-btn accent"><i class="fas fa-marker"></i> 标记时间</button>
+                    </div>
+                    
+
+                </div>
+
+                <div class="card">
+                    <div class="lyric-preview-header">
+                        <h2>歌词预览</h2>
+                    </div>
+                    <div id="lyric-preview" class="lyric-preview">
+                        <div class="placeholder-text">请输入歌词并分割，或导入LRC文件</div>
+                    </div>
+                    <div class="add-blank-lyric">
+                        <button id="add-blank-btn" class="action-btn"><i class="fas fa-plus-circle"></i> 添加空白歌词</button>
+                    </div>
+                </div>
+
+                <div class="card" id="adjustment-panel">
+                    <h2>时间调整</h2>
+                    <p>调整所有时间码（秒.毫秒，如: 0.500 或 -0.200）</p>
+                    <div class="adjustment-controls">
+                        <input type="text" id="time-adjust" placeholder="输入调整值">
+                        <button id="apply-adjustment" class="action-btn primary">应用调整</button>
+                    </div>
+                    <!-- 替换导出按钮为下一步按钮 -->
+                    <button id="next-step-btn" class="action-btn accent"><i class="fas fa-arrow-right"></i> 下一步：预览同步效果</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- 新增预览界面 -->
+        <main id="preview-interface" class="hidden">
+            <section class="preview-main">
+                <div class="card">
+                    <h2>歌词同步预览</h2>
+                                       
+                    <!-- 音频播放器 -->
+                    <div class="preview-audio">
+                        <audio id="preview-audio-player" controls hidden></audio>
+                        <!-- 自定义音频播放器（预览界面） -->
+                        <div class="custom-audio-player preview">
+                            <div class="audio-progress-bar">
+                                <div class="progress-track">
+                                    <div class="progress-fill"></div>
+                                    <div class="progress-handle"></div>
+                                </div>
+                                <div class="time-display">
+                                    <span class="preview-current-time">00:00.00</span>
+                                    <span class="separator">/</span>
+                                    <span class="preview-total-time">00:00.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 播放控制按钮 -->
+                    <div class="preview-timing-buttons">
+                        <button id="preview-prev-2s" class="control-btn"><i class="fas fa-backward-step"></i> 后退2秒</button>
+                        <button id="preview-play-pause" class="control-btn primary"><i class="fas fa-play"></i> 播放/暂停</button>
+                        <button id="preview-next-2s" class="control-btn"><i class="fas fa-forward-step"></i> 前进2秒</button>
+                    </div>
+
+                    <!-- 歌词同步显示区域 -->
+                    <div class="sync-lyric-container">
+                        <div id="sync-lyric-display" class="sync-lyric-display">
+                            <div class="placeholder-text">播放音频开始预览歌词同步效果</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 元数据模块 -->
+                    <div class="metadata-container">
+                        <div class="metadata-header">
+                            <h3 id="toggle-metadata-btn"><i class="fas fa-chevron-down"></i> 歌词元数据</h3>
+                        </div>
+                        <div id="metadata-content" class="metadata-content hidden">
+                            <div class="metadata-grid">
+                                <div class="metadata-item">
+                                    <label for="meta-ar">[ar] 歌手/艺术家:</label>
+                                    <input type="text" id="meta-ar" placeholder="歌手姓名">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-ti">[ti] 歌曲名/标题:</label>
+                                    <input type="text" id="meta-ti" placeholder="歌曲名称">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-al">[al] 专辑名:</label>
+                                    <input type="text" id="meta-al" placeholder="专辑名称">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-by">[by] 歌词制作/编辑者:</label>
+                                    <input type="text" id="meta-by" placeholder="制作者姓名">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-offset">[offset] 时间偏移量 (毫秒):</label>
+                                    <input type="number" id="meta-offset" placeholder="0">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-length">[length] 歌曲总时长:</label>
+                                    <input type="text" id="meta-length" placeholder="00:00.00">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-au">[au] 演唱者:</label>
+                                    <input type="text" id="meta-au" placeholder="演唱者姓名">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-re">[re] 编曲者:</label>
+                                    <input type="text" id="meta-re" placeholder="编曲者姓名">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-ve">[ve] 版本信息:</label>
+                                    <input type="text" id="meta-ve" placeholder="版本号或描述">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-composer">[composer] 作曲者:</label>
+                                    <input type="text" id="meta-composer" placeholder="作曲者姓名">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-lyricist">[lyricist] 作词人:</label>
+                                    <input type="text" id="meta-lyricist" placeholder="作词人姓名">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-translator">[translator] 翻译者:</label>
+                                    <input type="text" id="meta-translator" placeholder="翻译者姓名">
+                                </div>
+                                <div class="metadata-item">
+                                    <label for="meta-language">[language] 歌词语言:</label>
+                                    <input type="text" id="meta-language" placeholder="语言名称">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 控制按钮 -->
+                    <div class="preview-controls">
+                        <button id="back-to-edit" class="action-btn"><i class="fas fa-arrow-left"></i> 上一步：返回编辑</button>
+                        <button id="export-lrc" class="action-btn accent"><i class="fas fa-download"></i> 导出LRC文件</button>
+                    </div>
+                    
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Copyright Info</p>
+        </footer>
+
+        <!-- 浮动按钮 -->
+        <div class="floating-buttons">
+            <button id="theme-toggle" class="floating-button theme-toggle" title="切换主题">
+                <i class="fas fa-moon"></i>
+            </button>
+            <a href="https://github.com/landeyucc/" target="_blank" class="floating-button github-link" title="GitHub项目">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+    </div>
+
+
+
+    <!-- 消息提示容器 -->
+    <div id="message-container" class="message-container"></div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="js/audioHandler.js"></script>
+    <script src="js/lyricHandler.js"></script>
+    <script src="js/timeHandler.js"></script>
+    <script src="js/uiController.js"></script>
+    <script src="js/themeController.js"></script>
+    <script src="js/languageController.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
