@@ -4,6 +4,8 @@
 
 ### 切换文档语言 [中文](README_CN.md) | [English](README.md)
 
+### 前往 [EasyLRC 工具网站](https://lrc.vl-x.vip/)
+
 EasyLRC 是一个基于 Web 的歌词处理工具，旨在提供一个直观且功能丰富的LRC制作平台，用于创建、编辑和同步歌词的时间码。它支持LRC所广泛支持的标准与兼容非行业标准的语法，并集成了音频播放并同步预览功能，并且支持解析并导出元数据，使用户能够轻松地创建和修改歌词文件。
 
 ![Pages](EasyLRC_A_Light.png)
