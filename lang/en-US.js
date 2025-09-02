@@ -48,6 +48,10 @@ const en_US = {
     operationSuccessTitle: 'Operation Successful',
     lyricDeletedMessage: 'Lyric deleted',
     jumpToLyric: 'Jumped to lyric {index}',
+    
+    // Bilingual lyrics
+    bilingual_enabled_title: 'Bilingual Lyrics Enabled',
+    bilingual_enabled_message: 'Text Input: Odd lines are lyrics, even lines are translations\nLRC Import: Content after "/" will be recognized as translation',
 
     // File Detection
     audioFileDetected: 'Detected {count} audio files, only loading the first one',
@@ -64,7 +68,7 @@ const en_US = {
     "import_lrc": "Import LRC",
     "enable_bilingual": "Enable Bilingual Lyrics",
     "bilingual_tooltip": "When enabled: Text input will use odd lines as lyrics and even lines as translations; When importing LRC, content after "/" or in double-line format will be recognized as translations",
-    "lyric_textarea_placeholder": "Enter lyrics here, they will be automatically split by spaces, commas, and periods...\nWhen bilingual lyrics are enabled: odd lines are lyrics, even lines are translations (empty lines allowed)",
+    "lyric_textarea_placeholder": "Enter lyrics here, they will be automatically split by line break, commas, and periods...\nWhen bilingual lyrics are enabled: odd lines are lyrics, even lines are translations (empty lines allowed)",
     "split_lyric": "Split Lyrics",
     "upload_lrc": "Upload LRC File",
     

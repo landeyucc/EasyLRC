@@ -42,6 +42,10 @@ const zh_CN = {
     operationSuccessTitle: '操作成功',
     lyricDeletedMessage: '歌词已删除',
     jumpToLyric: '已跳转处理至第 {index} 句歌词',
+    
+    // 双语歌词
+    bilingual_enabled_title: '双语歌词已启用',
+    bilingual_enabled_message: '文本输入：单数行为歌词，双数行为翻译\nLRC导入：将识别"/"后的内容作为翻译',
 
     // 文件检测
     audioFileDetected: '检测到 {count} 个音频文件，仅加载第一个',
@@ -64,7 +68,7 @@ const zh_CN = {
     "import_lrc": "导入LRC",
     "enable_bilingual": "启用双语歌词",
     "bilingual_tooltip": "启用后：文本输入将单数行作为歌词，双数行作为翻译；导入LRC时将识别"/"后的内容或双行格式作为翻译",
-    "lyric_textarea_placeholder": "在此输入歌词，将按空格、逗号和句号自动分割...\n启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）",
+    "lyric_textarea_placeholder": "在此输入歌词，将按换行符、逗号和句号自动分割...\n启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）",
     "split_lyric": "分割歌词",
     "upload_lrc": "上传LRC文件",
     

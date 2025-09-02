@@ -1007,15 +1007,15 @@ const lyricHandler = (() => {
         
         // 更新提示文本
         if (bilingualEnabled) {
-            $('#lyric-textarea').attr('placeholder', '启用双语歌词模式：\n单数行为歌词，双数行为翻译（可留空行）');
+            $('#lyric-textarea').attr('placeholder', languageController.getText('lyric_textarea_placeholder'));
             uiController.showMessage({
-                title: '双语歌词已启用',
-                message: '文本输入：单数行为歌词，双数行为翻译\nLRC导入：将识别"/"后的内容作为翻译',
+                title: languageController.getText('bilingual_enabled_title') || '双语歌词已启用',
+                message: languageController.getText('bilingual_enabled_message') || '文本输入：单数行为歌词，双数行为翻译\nLRC导入：将识别"/"后的内容作为翻译',
                 type: 'info',
                 duration: 5000
             });
         } else {
-            $('#lyric-textarea').attr('placeholder', '在此输入歌词，将按空格、逗号和句号自动分割...');
+            $('#lyric-textarea').attr('placeholder', languageController.getText('lyric_textarea_placeholder').split('\n')[0]);
         }
         
         // 如果已有歌词，重新渲染预览

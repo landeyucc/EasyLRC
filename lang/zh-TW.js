@@ -42,6 +42,10 @@ const zh_TW = {
     operationSuccessTitle: '操作成功',
     lyricDeletedMessage: '歌詞已刪除',
     jumpToLyric: '已跳轉處理至第 {index} 句歌詞',
+    
+    // 雙語歌詞
+    bilingual_enabled_title: '雙語歌詞已啟用',
+    bilingual_enabled_message: '文本輸入：單數行為歌詞，雙數行為翻譯\nLRC導入：將識別"/"後的內容作為翻譯',
 
     // 檔案偵測
     audioFileDetected: '偵測到 {count} 個音訊檔案，僅載入第一個',
@@ -64,7 +68,7 @@ const zh_TW = {
     "import_lrc": "導入LRC",
     "enable_bilingual": "啟用雙語歌詞",
     "bilingual_tooltip": "啟用後：文本輸入將單數行作為歌詞，雙數行作為翻譯；導入LRC時將識別"/"後的內容或雙行格式作為翻譯",
-    "lyric_textarea_placeholder": "在此輸入歌詞，將按空格、逗號和句號自動分割...\n啟用雙語歌詞後：單數行為歌詞，雙數行為翻譯（可留空行）",
+    "lyric_textarea_placeholder": "在此輸入歌詞，將按換行符、逗號和句號自動分割...\n啟用雙語歌詞後：單數行為歌詞，雙數行為翻譯（可留空行）",
     "split_lyric": "分割歌詞",
     "upload_lrc": "上傳LRC文件",
     
