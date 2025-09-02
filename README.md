@@ -128,3 +128,6 @@ Contributions to this project are welcome! If you have any suggestions, bug repo
 ## License
 
 This project is open-sourced under the MIT License. Please refer to the `LICENSE` file for details.
+
+## Acknowledgements
+This project initially received inspiration from the [lrc_editor](https://github.com/yiyizym/lrc_editor) project. I would like to express my gratitude to this project for providing me with the inspiration and ideas that helped me develop this project.
