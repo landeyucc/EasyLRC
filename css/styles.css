@@ -710,6 +710,44 @@ input[type="file"] {
     cursor: pointer;
 }
 
+/* 解析模式选项样式 */
+.parsing-mode-container {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.parsing-mode-container h4 {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.parsing-mode-options {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.parsing-mode-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.parsing-mode-label:hover {
+    background-color: var(--hover-color);
+}
+
+.parsing-mode-label input[type="radio"] {
+    cursor: pointer;
+}
+
 .timing-navigation, .timing-buttons {
     display: flex;
     gap: 10px;

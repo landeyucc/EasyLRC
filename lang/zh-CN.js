@@ -71,6 +71,9 @@ const zh_CN = {
     "lyric_textarea_placeholder": "在此输入歌词，将按换行符、逗号和句号自动分割...\n启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）",
     "split_lyric": "分割歌词",
     "upload_lrc": "上传LRC文件",
+    "parsing_mode": "解析模式",
+    "default_mode": "默认模式（按LRC行内顺序解析）",
+    "strict_mode": "严格模式（按时间码排序导入）",
     
     // 打节奏控制区域
     "timing_controls": "打节奏控制",

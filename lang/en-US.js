@@ -71,6 +71,9 @@ const en_US = {
     "lyric_textarea_placeholder": "Enter lyrics here, they will be automatically split by line break, commas, and periods...\nWhen bilingual lyrics are enabled: odd lines are lyrics, even lines are translations (empty lines allowed)",
     "split_lyric": "Split Lyrics",
     "upload_lrc": "Upload LRC File",
+    "parsing_mode": "Parsing Mode",
+    "default_mode": "Default Mode (Parse by original LRC line order)",
+    "strict_mode": "Strict Mode (Import by timecode sorting)",
     
     // Timing control area
     "timing_controls": "Timing Controls",

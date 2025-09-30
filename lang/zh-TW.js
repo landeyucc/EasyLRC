@@ -71,6 +71,9 @@ const zh_TW = {
     "lyric_textarea_placeholder": "在此輸入歌詞，將按換行符、逗號和句號自動分割...\n啟用雙語歌詞後：單數行為歌詞，雙數行為翻譯（可留空行）",
     "split_lyric": "分割歌詞",
     "upload_lrc": "上傳LRC文件",
+    "parsing_mode": "解析模式",
+    "default_mode": "預設模式（按原LRC行順序解析）",
+    "strict_mode": "嚴格模式（按時間碼排序導入）",
     
     // 打節奏控制區域
     "timing_controls": "打節奏控制",

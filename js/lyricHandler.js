@@ -93,6 +93,12 @@ const lyricHandler = (() => {
         uiController.updateLyricContext();
     };
     
+    // 获取当前选择的解析模式
+    const getParsingMode = () => {
+        const mode = $('input[name="parsing-mode"]:checked').val();
+        return mode || 'default'; // 默认使用默认模式
+    };
+    
     // 导入LRC文件
     const importLRC = (file) => {
         const reader = new FileReader();
@@ -238,13 +244,25 @@ const lyricHandler = (() => {
                 }
             }
             
-            // 按时间排序（有时间的在前，无时间的在后）
-            lyrics.sort((a, b) => {
-                if (a.time === null && b.time === null) return 0;
-                if (a.time === null) return 1;
-                if (b.time === null) return -1;
-                return a.time - b.time;
-            });
+            // 根据解析模式决定是否按时间排序
+            const parsingMode = getParsingMode();
+            if (parsingMode === 'strict') {
+                // 严格模式：按时间排序（有时间的在前，无时间的在后）
+                lyrics.sort((a, b) => {
+                    if (a.time === null && b.time === null) return 0;
+                    if (a.time === null) return 1;
+                    if (b.time === null) return -1;
+                    return a.time - b.time;
+                });
+            } else {
+                // 默认模式：保持原LRC文件中的顺序
+                // 只对null时间的项进行排序（放到最后）
+                lyrics.sort((a, b) => {
+                    if (a.time === null && b.time !== null) return 1;
+                    if (a.time !== null && b.time === null) return -1;
+                    return 0; // 保持原有顺序
+                });
+            }
             
             currentLyricIndex = 0;
             renderLyricPreview();

@@ -130,6 +130,15 @@ const languageController = (() => {
         const data = languageData[lang];
         if (!data) return;
         
+        // 首先保存解析模式相关的文本，以便后续使用
+        const parsingModeData = {
+            parsing_mode: data.parsing_mode,
+            default_mode: data.default_mode,
+            strict_mode: data.strict_mode
+        };
+        
+        console.log('应用语言:', lang, '解析模式数据:', parsingModeData);
+        
         // 更新歌词上下文显示区域的标签文本
         $('#prev-lyric-label').text(getText('prev_lyric_text'));
         $('#current-lyric-label').text(getText('current_lyric_text'));
@@ -176,6 +185,9 @@ const languageController = (() => {
         
         const uploadLrcLabel = document.querySelector('#lrc-upload-container .upload-label span');
         if (uploadLrcLabel) uploadLrcLabel.textContent = data.upload_lrc;
+        
+        // 更新解析模式区域
+        updateParsingModeText(parsingModeData);
         
         // 更新打节奏控制区域
         const timingControlsH2 = document.querySelector('#timing-controls h2');
@@ -465,6 +477,60 @@ const languageController = (() => {
         return languageData[currentLanguage]?.[key] || key;
     };
     
+    // 专门的函数用于更新解析模式区域的文本，确保与其他功能区完全分离
+    const updateParsingModeText = (data) => {
+        if (!data) return;
+        
+        console.log('更新解析模式文本:', data);
+        
+        // 使用直接的DOM选择器，避免与其他选择器冲突
+        const parsingModeTitle = document.getElementById('parsing-mode-title');
+        if (parsingModeTitle) {
+            console.log('更新解析模式标题为:', data.parsing_mode);
+            parsingModeTitle.textContent = data.parsing_mode;
+        }
+        
+        const defaultModeText = document.getElementById('default-mode-text');
+        if (defaultModeText) {
+            console.log('更新默认模式文本为:', data.default_mode);
+            defaultModeText.textContent = data.default_mode;
+        }
+        
+        const strictModeText = document.getElementById('strict-mode-text');
+        if (strictModeText) {
+            console.log('更新严格模式文本为:', data.strict_mode);
+            strictModeText.textContent = data.strict_mode;
+        }
+    };
+    
+    // 在DOM完全加载后再次应用解析模式的翻译
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            const data = languageData[currentLanguage];
+            if (data) {
+                const parsingModeData = {
+                    parsing_mode: data.parsing_mode,
+                    default_mode: data.default_mode,
+                    strict_mode: data.strict_mode
+                };
+                updateParsingModeText(parsingModeData);
+            }
+        }, 100);
+    });
+    
+    // 添加全局方法，允许手动更新解析模式文本，用于调试
+    window.updateParsingMode = function() {
+        const data = languageData[currentLanguage];
+        if (data) {
+            const parsingModeData = {
+                parsing_mode: data.parsing_mode,
+                default_mode: data.default_mode,
+                strict_mode: data.strict_mode
+            };
+            updateParsingModeText(parsingModeData);
+        }
+    };
+    
     // 公开API
     return {
         init,
@@ -473,3 +539,13 @@ const languageController = (() => {
         applyLanguage
     };
 })();
+
+// 确保DOM完全加载后手动更新解析模式文本
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        if (typeof languageController !== 'undefined' && typeof window.updateParsingMode === 'function') {
+            console.log('手动触发解析模式文本更新');
+            window.updateParsingMode();
+        }
+    }, 200);
+});

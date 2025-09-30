@@ -74,6 +74,20 @@
                             <span>上传LRC文件</span>
                         </label>
                         <input type="file" id="lrc-upload" accept=".lrc">
+                        
+                        <div class="parsing-mode-container">
+                            <h3 id="parsing-mode-title">解析模式</h3>
+                            <div class="radio-group">
+                                <label class="parsing-mode-label">
+                                    <input type="radio" name="parsing-mode" value="default" checked>
+                                    <span id="default-mode-text">默认模式</span>
+                                </label>
+                                <label class="parsing-mode-label">
+                                    <input type="radio" name="parsing-mode" value="strict">
+                                    <span id="strict-mode-text">严格模式</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
