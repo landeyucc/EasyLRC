@@ -4,7 +4,7 @@
 
 ### Switch Document Language [简体中文](README_CN.md) | [English](README.md)
 
-### Go to [EasyLRC Tool Website](https://lrc.vl-x.vip/)
+### Go to [EasyLRC Tool Website](https://lrc.isea.dev/)
 
 EasyLRC is a web-based lyric processing tool designed to provide an intuitive and feature-rich LRC creation platform for creating, editing, and synchronizing lyric timestamps. It supports widely adopted LRC standards and is compatible with non-industry standard syntax. It integrates audio playback with synchronized preview functionality and supports parsing and exporting metadata, allowing users to easily create and modify lyric files.
 
@@ -61,7 +61,7 @@ EasyLRC is a web-based lyric processing tool designed to provide an intuitive an
 
 #### Metadata Parsing
  ```txt
- [ar:Artist]
+[ar:Artist]
 [ti:Song Title]
 [al:Album Name]
 [by:Lyric Creator/Editor]
