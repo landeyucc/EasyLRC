@@ -27,15 +27,16 @@ const audioHandler = (function() {
     
     // 设置拖放区域
     function setupDragAndDrop() {
-        // 添加全局拖放支持
         const body = document.body;
+        let dragCounter = 0;
+        let highlightTimer = null;
         
         // 阻止浏览器默认拖放行为
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(eventName) {
             body.addEventListener(eventName, preventDefaults, false);
         });
         
-        // 高亮效果
+        // 高亮效果 - 使用计数器解决闪烁问题
         ['dragenter', 'dragover'].forEach(function(eventName) {
             body.addEventListener(eventName, highlight, false);
         });
@@ -52,15 +53,27 @@ const audioHandler = (function() {
             e.stopPropagation();
         }
         
-        function highlight() {
-            body.classList.add('drag-over');
+        function highlight(e) {
+            dragCounter++;
+            if (dragCounter > 0) {
+                body.classList.add('drag-over');
+                // 设置拖放提示文本
+                const dropText = languageController.getText('drop_to_upload') || '释放以上传文件';
+                body.setAttribute('data-drop-text', dropText);
+            }
         }
         
-        function unhighlight() {
-            body.classList.remove('drag-over');
+        function unhighlight(e) {
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                body.classList.remove('drag-over');
+            }
         }
         
         function handleDrop(e) {
+            dragCounter = 0;
+            body.classList.remove('drag-over');
             const dt = e.dataTransfer;
             const files = dt.files;
             
@@ -68,6 +81,7 @@ const audioHandler = (function() {
                 // 处理多个文件
                 let audioFiles = [];
                 let lyricFiles = [];
+                let subtitleFiles = [];
                 
                 // 分类文件
                 Array.from(files).forEach(file => {
@@ -75,10 +89,14 @@ const audioHandler = (function() {
                     if (file.type.startsWith('audio/')) {
                         audioFiles.push(file);
                     } 
-                    // 歌词文件
+                    // 字幕文件（SRT/VTT）
                     else {
                         const fileName = file.name.toLowerCase();
-                        if (fileName.endsWith('.lrc') || fileName.endsWith('.txt')) {
+                        if (fileName.endsWith('.srt') || fileName.endsWith('.vtt')) {
+                            subtitleFiles.push(file);
+                        }
+                        // 歌词文件
+                        else if (fileName.endsWith('.lrc') || fileName.endsWith('.txt')) {
                             lyricFiles.push(file);
                         }
                     }
@@ -97,6 +115,25 @@ const audioHandler = (function() {
                                 type: 'info',
                                 duration: 3000
                             });
+                        }
+                    }
+                }
+                
+                // 处理字幕文件（SRT/VTT）
+                if (subtitleFiles.length > 0) {
+                    // 默认处理第一个字幕文件
+                    if (typeof subtitleConverter !== 'undefined' && subtitleConverter.handleSubtitleFile) {
+                        subtitleConverter.handleSubtitleFile(subtitleFiles[0]);
+                        // 如果有多个字幕文件，显示提示
+                        if (subtitleFiles.length > 1) {
+                            if (typeof uiController !== 'undefined' && uiController.showMessage) {
+                                uiController.showMessage({
+                                    title: languageController.getText('tipTitle'),
+                                    message: languageController.getText('lyricFileDetected').replace('{count}', subtitleFiles.length),
+                                    type: 'info',
+                                    duration: 3000
+                                });
+                            }
                         }
                     }
                 }
@@ -144,6 +181,9 @@ const audioHandler = (function() {
             $('#play-pause i').removeClass('fa-pause').addClass('fa-play');
         }
         
+        // 启用播放按钮
+        updatePlayButtonsState(true);
+        
         // 当元数据加载完成后更新总时长
         audioElement.addEventListener('loadedmetadata', function() {
             updateTotalTime();
@@ -153,6 +193,29 @@ const audioHandler = (function() {
         previewAudioElement.addEventListener('loadedmetadata', function() {
             updatePreviewTotalTime();
         });
+    }
+    
+    // 更新播放按钮的禁用/启用状态
+    function updatePlayButtonsState(enabled) {
+        const playPauseBtn = document.querySelector('#play-pause');
+        const previewPlayPause = document.querySelector('#preview-play-pause');
+        
+        if (playPauseBtn) {
+            playPauseBtn.disabled = !enabled;
+            playPauseBtn.style.opacity = enabled ? '1' : '0.5';
+            playPauseBtn.style.cursor = enabled ? 'pointer' : 'not-allowed';
+        }
+        
+        if (previewPlayPause) {
+            previewPlayPause.disabled = !enabled;
+            previewPlayPause.style.opacity = enabled ? '1' : '0.5';
+            previewPlayPause.style.cursor = enabled ? 'pointer' : 'not-allowed';
+        }
+    }
+    
+    // 检查是否有音频加载
+    function hasAudio() {
+        return !!(audioElement.src && audioElement.src !== window.location.href);
     }
     
     // 音频上传处理
@@ -461,11 +524,27 @@ const audioHandler = (function() {
         }
     });
     
+    // 音频播放完毕时重置播放状态
+    audioElement.addEventListener('ended', function() {
+        const playPauseBtn = document.querySelector('#play-pause');
+        if (playPauseBtn) {
+            playPauseBtn.innerHTML = `<i class="fas fa-play"></i> ${languageController.getText('play_pause')}`;
+        }
+    });
+    
     // 实时更新预览界面当前时间和进度条显示
     previewAudioElement.addEventListener('timeupdate', function() {
         if (!isDragging && !isPreviewDragging) {
             updatePreviewCurrentTime();
             updatePreviewProgressBar();
+        }
+    });
+    
+    // 预览音频播放完毕时重置播放状态
+    previewAudioElement.addEventListener('ended', function() {
+        const previewPlayPause = document.querySelector('#preview-play-pause');
+        if (previewPlayPause) {
+            previewPlayPause.innerHTML = `<i class="fas fa-play"></i> ${languageController.getText('play_pause')}`;
         }
     });
     
@@ -486,6 +565,8 @@ const audioHandler = (function() {
         setPreviewCurrentTime: function(time) {
             previewAudioElement.currentTime = time;
         },
+        updatePlayButtonsState: updatePlayButtonsState,
+        hasAudio: hasAudio,
         // 用于全局快捷键的方法
         togglePlay: function() {
             // 根据当前页面状态决定切换主音频还是预览音频

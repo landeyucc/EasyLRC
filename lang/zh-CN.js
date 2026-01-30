@@ -9,6 +9,7 @@ const zh_CN = {
     // 音频文件区域
     "audio_file": "音频文件",
     "upload_audio": "上传音频文件",
+    "drop_to_upload": "释放以上传文件",
     
     // 歌词上下文
     noLyric: '无',
@@ -68,12 +69,35 @@ const zh_CN = {
     "import_lrc": "导入LRC",
     "enable_bilingual": "启用双语歌词",
     "bilingual_tooltip": "启用后：文本输入将单数行作为歌词，双数行作为翻译；导入LRC时将识别"/"后的内容或双行格式作为翻译",
+    "enable_recognize_time": "允许识别时间",
+    "recognize_time_tooltip": "启用后将自动识别文本框中的时间码和元数据，并格式化为对应的时间标记与元数据",
+    "timecodes_imported": "已导入 {count} 条带时间码的歌词",
+    "no_timecodes_found": "未找到时间码",
     "lyric_textarea_placeholder": "在此输入歌词，将按换行符、逗号和句号自动分割...\n启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）",
     "split_lyric": "分割歌词",
     "upload_lrc": "上传LRC文件",
     "parsing_mode": "解析模式",
     "default_mode": "默认模式（按LRC行内顺序解析）",
     "strict_mode": "严格模式（按时间码排序导入）",
+    
+    // 字幕转换功能
+    "convert_lrc": "转换LRC",
+    "convert_lrc_desc": "将SRT或VTT字幕文件转换为LRC格式",
+    "upload_subtitle": "上传字幕文件",
+    "supported_formats": "支持的格式",
+    "srt_format": "SRT",
+    "vtt_format": "VTT",
+    "convert_success": "成功转换 {count} 条字幕为LRC格式",
+    "subtitle_text_extracted": "已提取 {count} 条字幕文本",
+    "subtitle_imported_with_time": "已导入 {count} 条带时间的歌词",
+    "subtitle_fallback_text_only": "模块未加载，已回退到文本模式",
+    "subtitle_convert_mode": "转换模式",
+    "subtitle_text_only": "仅提取文本",
+    "subtitle_with_time": "提取时间与文本",
+    "parse_srt_error": "无法解析SRT文件，请检查文件格式",
+    "parse_vtt_error": "无法解析VTT文件，请检查文件格式",
+    "handle_subtitle_error": "处理字幕文件时出错：{error}",
+    "unsupported_format": "不支持的文件格式，请上传SRT或VTT文件",
     
     // 打节奏控制区域
     "timing_controls": "打节奏控制",
@@ -87,6 +111,7 @@ const zh_CN = {
     "current_lyric_text": "当前处理: ",
     "next_lyric_text": "下一歌词: ",
     "none": "无",
+    "uninitialized_time": "[--:--.--]",
     "back_2s": "后退2秒",
     "forward_2s": "前进2秒",
     "play_pause": "播放/暂停",

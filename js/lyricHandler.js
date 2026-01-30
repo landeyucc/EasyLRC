@@ -2,12 +2,41 @@
  * 歌词处理模块：负责歌词管理、解析、渲染等功能
  */
 const lyricHandler = (() => {
+    let resizeFrameId = null;
+    
+    const autoResizeTextarea = () => {
+        if (resizeFrameId) {
+            cancelAnimationFrame(resizeFrameId);
+        }
+        
+        resizeFrameId = requestAnimationFrame(() => {
+            const textarea = document.getElementById('lyric-textarea');
+            if (!textarea) return;
+            
+            textarea.style.height = 'auto';
+            const scrollHeight = textarea.scrollHeight;
+            const maxHeight = window.innerWidth >= 768 ? 675 : 500;
+            const newHeight = Math.min(scrollHeight, maxHeight);
+            
+            textarea.style.height = newHeight + 'px';
+            
+            if (scrollHeight > maxHeight) {
+                textarea.style.overflowY = 'auto';
+            } else {
+                textarea.style.overflowY = 'hidden';
+            }
+            
+            resizeFrameId = null;
+        });
+    };
+    
     // 导入TXT文件
     const importTXT = (file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
             const content = e.target.result;
             $('#lyric-textarea').val(content);
+            autoResizeTextarea();
             // 自动切换到文本输入选项卡
             $('#text-input-btn').click();
         };
@@ -23,6 +52,48 @@ const lyricHandler = (() => {
             importTXT(file);
         }
     };
+    
+    // 识别并格式化时间码和元数据
+    const recognizeTimeCodes = (content) => {
+        let result = content;
+        
+        // 识别时间码 [mm:ss.xx] 或 [mm:ss]
+        const timePattern = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,2}))?\]/g;
+        const timedLyrics = [];
+        let match;
+        
+        const lines = content.split('\n');
+        lines.forEach(line => {
+            const timeMatches = [...line.matchAll(timePattern)];
+            if (timeMatches.length > 0) {
+                timeMatches.forEach(tm => {
+                    const minutes = parseInt(tm[1]);
+                    const seconds = parseInt(tm[2]);
+                    const milliseconds = tm[3] ? parseInt(tm[3].padEnd(2, '0').substring(0, 2)) : 0;
+                    const time = minutes * 60 + seconds + milliseconds / 100;
+                    
+                    // 移除时间码后的文本作为歌词内容
+                    const timeEndIndex = tm.index + tm[0].length;
+                    const text = line.substring(timeEndIndex).trim();
+                    
+                    if (text) {
+                        timedLyrics.push({ time, text });
+                    }
+                });
+            }
+        });
+        
+        // 标准化时间码格式
+        result = result.replace(timePattern, (match, min, sec, ms) => {
+            const minutes = parseInt(min);
+            const seconds = parseInt(sec);
+            const milliseconds = ms ? parseInt(ms.padEnd(2, '0').substring(0, 2)) : 0;
+            return `[${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}]`;
+        });
+        
+        return { formatted: result, timedLyrics };
+    };
+    
     // 歌词数据数组
     let lyrics = [];
     // 是否启用双语歌词
@@ -35,6 +106,32 @@ const lyricHandler = (() => {
     let processMode = 'line';
     // 当前处理的字符索引（用于逐字处理模式）
     let currentCharIndex = 0;
+    
+    // 直接导入带时间的歌词数据（用于字幕转换）
+    const importTimedLyrics = (timedLyrics) => {
+        if (!Array.isArray(timedLyrics) || timedLyrics.length === 0) {
+            uiController.showMessage({
+                title: languageController.getText('tipTitle'),
+                message: '没有有效的歌词数据',
+                type: 'error',
+                duration: 3000
+            });
+            return;
+        }
+        
+        // 直接使用带时间的歌词数据
+        lyrics = timedLyrics.map(item => ({
+            text: item.text,
+            time: item.time !== undefined ? item.time : null
+        }));
+        
+        currentLyricIndex = 0;
+        currentCharIndex = 0;
+        
+        // 更新预览和上下文
+        renderLyricPreview();
+        uiController.updateLyricContext();
+    };
     
     // 分割歌词（按空格、逗号、句号）
     const splitLyrics = () => {
@@ -49,24 +146,62 @@ const lyricHandler = (() => {
             return;
         }
         
+        // 检查是否开启了"允许识别时间"开关
+        const recognizeTimeEnabled = document.getElementById('recognize-time-toggle')?.checked;
+        
         // 按换行分割，保留所有行（包括空行）
         const allLines = text.split('\n');
         
         // 重置歌词数据
         lyrics = [];
         
-        if (bilingualEnabled) {
+        // 识别时间码的正则表达式
+        const timePattern = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,2}))?\]/g;
+        
+        if (recognizeTimeEnabled) {
+            // 允许识别时间模式：识别时间码并导入
+            allLines.forEach(line => {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) return;
+                
+                const timeMatches = [...trimmedLine.matchAll(timePattern)];
+                if (timeMatches.length > 0) {
+                    // 处理带时间码的行
+                    timeMatches.forEach(tm => {
+                        const minutes = parseInt(tm[1]);
+                        const seconds = parseInt(tm[2]);
+                        const milliseconds = tm[3] ? parseInt(tm[3].padEnd(2, '0').substring(0, 2)) : 0;
+                        const time = minutes * 60 + seconds + milliseconds / 100;
+                        
+                        const timeEndIndex = tm.index + tm[0].length;
+                        const lyricText = trimmedLine.substring(timeEndIndex).trim();
+                        
+                        if (lyricText) {
+                            lyrics.push({
+                                text: lyricText,
+                                time: time
+                            });
+                        }
+                    });
+                } else {
+                    // 没有时间码的行作为普通歌词
+                    lyrics.push({
+                        text: trimmedLine,
+                        time: null
+                    });
+                }
+            });
+        } else if (bilingualEnabled) {
             // 双语歌词模式：单数行为主歌词，双数行为翻译
             for (let i = 0; i < allLines.length; i += 2) {
                 const mainLyric = allLines[i].trim();
-                // 检查是否有下一行作为翻译（可能不存在）
                 const translation = (i + 1 < allLines.length) ? allLines[i + 1].trim() : '';
                 
-                if (mainLyric) { // 主歌词不能为空
+                if (mainLyric) {
                     lyrics.push({
                         text: mainLyric,
                         time: null,
-                        translation: translation // 翻译可以为空
+                        translation: translation
                     });
                 }
             }
@@ -1066,15 +1201,35 @@ const lyricHandler = (() => {
     $('#text-input-btn').on('click', function() {
         $(this).addClass('active');
         $('#lrc-upload-btn').removeClass('active');
+        $('#subtitle-convert-btn').removeClass('active');
         $('#text-input-container').removeClass('hidden');
         $('#lrc-upload-container').addClass('hidden');
+        $('#subtitle-converter-container').addClass('hidden');
     });
     $('#lrc-upload-btn').on('click', function() {
         $(this).addClass('active');
         $('#text-input-btn').removeClass('active');
+        $('#subtitle-convert-btn').removeClass('active');
         $('#lrc-upload-container').removeClass('hidden');
         $('#text-input-container').addClass('hidden');
+        $('#subtitle-converter-container').addClass('hidden');
     });
+    $('#subtitle-convert-btn').on('click', function() {
+        $(this).addClass('active');
+        $('#text-input-btn').removeClass('active');
+        $('#lrc-upload-btn').removeClass('active');
+        $('#subtitle-converter-container').removeClass('hidden');
+        $('#text-input-container').addClass('hidden');
+        $('#lrc-upload-container').addClass('hidden');
+    });
+    
+    // 绑定textarea自动调整高度
+    $('#lyric-textarea').on('input', function() {
+        autoResizeTextarea();
+    });
+    
+    // 初始化时调整高度
+    setTimeout(autoResizeTextarea, 100);
     
     return {
         getLyrics: () => lyrics,
@@ -1097,6 +1252,9 @@ const lyricHandler = (() => {
         markCurrentLyricTime,
         syncLyricWithAudio,
         renderPreviewLyrics,
-        navigateLyric
+        navigateLyric,
+        autoResizeTextarea,
+        importTimedLyrics,
+        recognizeTimeCodes
     };
 })();

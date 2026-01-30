@@ -11,6 +11,11 @@ $(document).ready(() => {
     // 初始化歌词预览
     lyricHandler.renderLyricPreview();
     
+    // 初始化时禁用播放按钮（没有音频时）
+    if (typeof audioHandler !== 'undefined' && audioHandler.updatePlayButtonsState) {
+        audioHandler.updatePlayButtonsState(false);
+    }
+    
     // 跟踪当前界面状态（编辑界面或预览界面）
     window.isPreviewMode = false;
     
@@ -45,7 +50,7 @@ $(document).ready(() => {
             // 创建一个临时的文件输入元素
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
-            fileInput.accept = 'audio/*,.lrc,.txt';
+            fileInput.accept = 'audio/*,.lrc,.txt,.srt,.vtt';
             fileInput.style.display = 'none';
             document.body.appendChild(fileInput);
             
@@ -60,11 +65,14 @@ $(document).ready(() => {
             fileInput.addEventListener('change', function() {
                 if (this.files && this.files.length > 0) {
                     const file = this.files[0];
+                    const fileName = file.name.toLowerCase();
                     // 根据文件类型处理
                     if (file.type.startsWith('audio/')) {
                         audioHandler.handleAudioFile(file);
-                    } else if (file.name.toLowerCase().endsWith('.lrc') || file.name.toLowerCase().endsWith('.txt')) {
+                    } else if (fileName.endsWith('.lrc') || fileName.endsWith('.txt')) {
                         lyricHandler.handleLyricFile(file);
+                    } else if (fileName.endsWith('.srt') || fileName.endsWith('.vtt')) {
+                        subtitleConverter.handleSubtitleFile(file);
                     }
                 }
                 // 移除临时元素
@@ -154,9 +162,73 @@ $(document).ready(() => {
         }
     });
 
+    // 绑定字幕上传事件
+    $('#subtitle-upload').on('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            subtitleConverter.handleSubtitleFile(file);
+            // 清空input以便重复选择同一文件
+            $(this).val('');
+        }
+    });
+    
+    // 处理textarea手动调整高度
+    const textarea = document.getElementById('lyric-textarea');
+    if (textarea) {
+        let isManuallyResizing = false;
+        let manualHeight = null;
+        
+        textarea.addEventListener('mousedown', function(e) {
+            if (e.offsetY > textarea.clientHeight - 10) {
+                isManuallyResizing = true;
+                manualHeight = textarea.style.height;
+                textarea.classList.add('manual-resize');
+            }
+        });
+        
+        document.addEventListener('mouseup', function() {
+            if (isManuallyResizing) {
+                isManuallyResizing = false;
+                textarea.classList.remove('manual-resize');
+            }
+        });
+        
+        textarea.addEventListener('input', function() {
+            if (!isManuallyResizing) {
+                lyricHandler.autoResizeTextarea();
+            }
+        });
+    }
+
+    // 绑定识别时间开关事件
+    $('#recognize-time-toggle').on('change', function() {
+        const textarea = document.getElementById('lyric-textarea');
+        if (!textarea) return;
+        
+        if (this.checked) {
+            // 开启时：识别并格式化现有内容，保留在textarea中
+            const content = textarea.value;
+            const result = lyricHandler.recognizeTimeCodes(content);
+            textarea.value = result.formatted;
+            lyricHandler.autoResizeTextarea();
+        }
+    });
+    
     // 绑定全局事件
-    $(window).on('beforeunload', () => {
-        return languageController.getText('leave_confirm');
+    $(window).on('beforeunload', (e) => {
+        const textarea = document.getElementById('lyric-textarea');
+        const hasTextareaContent = textarea && textarea.value.trim().length > 0;
+        const hasAudio = audioHandler.getAudioElement() && audioHandler.getAudioElement().src;
+        const lyrics = lyricHandler.getLyrics();
+        const hasLyrics = lyrics && lyrics.length > 0;
+        const hasProcessLyrics = lyrics && lyrics.some(l => l.time !== null);
+        
+        if (hasTextareaContent || hasAudio || hasLyrics || hasProcessLyrics) {
+            const message = languageController.getText('leave_confirm');
+            e.preventDefault();
+            e.returnValue = message;
+            return message;
+        }
     });
 });
 

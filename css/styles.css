@@ -56,6 +56,7 @@ body {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+    gap: 10px;
 }
 
 .switch {
@@ -393,7 +394,7 @@ body.drag-over {
 }
 
 body.drag-over::before {
-    content: '释放以上传文件';
+    content: attr(data-drop-text);
     position: fixed;
     top: 50%;
     left: 50%;
@@ -512,6 +513,57 @@ input[type="file"] {
     display: none;
 }
 
+/* 字幕转换功能样式 */
+#subtitle-converter-container {
+    margin-top: 15px;
+}
+
+.subtitle-mode-container {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.subtitle-mode-container .radio-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.subtitle-mode-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.subtitle-mode-label:hover {
+    background-color: var(--hover-color);
+}
+
+.subtitle-mode-label input[type="radio"] {
+    cursor: pointer;
+}
+
+#subtitle-converter-container .supported-formats {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+#subtitle-converter-container .format-badge {
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #4a90e2;
+    color: white;
+}
+
 /* 按钮样式 */
 .action-btn, .control-btn, .option-btn {
     border: none;
@@ -575,6 +627,11 @@ input[type="file"] {
     color: white;
 }
 
+.control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+}
+
 .option-btn {
     background-color: transparent;
     border: 1px solid transparent;
@@ -589,7 +646,9 @@ input[type="file"] {
 /* 歌词输入区域 */
 #lyric-textarea {
     width: 100%;
-    min-height: 200px;
+    min-height: 150px;
+    max-height: 500px;
+    height: auto;
     padding: 15px;
     border: none;
     border-radius: 12px;
@@ -600,9 +659,13 @@ input[type="file"] {
     margin-bottom: 15px;
     font-size: 1rem;
     color: var(--text-color);
-    /* 移除滚动条但保持滚动功能 */
     overflow-y: auto;
     overflow-x: hidden;
+    transition: height 0.1s ease;
+}
+
+#lyric-textarea.manual-resize {
+    transition: none;
 }
 
 /* 移除滚动条 - WebKit浏览器 */
@@ -618,8 +681,9 @@ input[type="file"] {
 /* PC端样式 */
 @media (min-width: 768px) {
     #lyric-textarea {
-        height: 200px;
+        min-height: 200px;
         max-height: 675px;
+        height: 200px;
     }
 }
 
@@ -643,6 +707,7 @@ input[type="file"] {
     margin-bottom: 15px;
     color: var(--text-color);
     /* 隐藏垂直滚动条 - Firefox */
+    -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
@@ -937,6 +1002,7 @@ input[type="file"] {
 .metadata-header {
     padding: 15px 20px;
     cursor: pointer;
+    -webkit-user-select: none;
     user-select: none;
     transition: all 0.3s ease;
 }

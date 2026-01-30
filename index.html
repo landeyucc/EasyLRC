@@ -8,7 +8,7 @@
     <title>EasyLRC</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=20250130">
     <link rel="shortcut icon" href="icon/EasyLRC.png" type="image/x-icon" sizes="16x16 32x32 64x64">
 </head>
 <body>
@@ -51,8 +51,9 @@
                 <div class="card">
                     <h2>歌词输入</h2>
                     <div class="lyric-input-options">
-                        <button id="text-input-btn" class="option-btn active">文本输入</button>
-                        <button id="lrc-upload-btn" class="option-btn">导入LRC</button>
+                        <button id="text-input-btn" class="option-btn active" data-i18n="text_input">文本输入</button>
+                        <button id="lrc-upload-btn" class="option-btn" data-i18n="import_lrc">导入LRC</button>
+                        <button id="subtitle-convert-btn" class="option-btn" data-i18n="convert_lrc">转换LRC</button>
                     </div>
                     
                     <div id="text-input-container">
@@ -61,32 +62,66 @@
                                 <input type="checkbox" id="bilingual-toggle">
                                 <span class="slider round"></span>
                             </label>
-                            <span class="switch-label">启用双语歌词</span>
-                            <span class="tooltip-icon" title="启用后：文本输入将单数行作为歌词，双数行作为翻译；导入LRC时将识别"/"后的内容或双行格式作为翻译"><i class="fas fa-question-circle"></i></span>
+                            <span class="switch-label" data-i18n="enable_bilingual">启用双语歌词</span>
+                            <span class="tooltip-icon" data-i18n-title="bilingual_tooltip" title="启用后：文本输入将单数行作为歌词，双数行作为翻译；导入LRC时将识别"/"后的内容或双行格式作为翻译"><i class="fas fa-question-circle"></i></span>
                         </div>
-                        <textarea id="lyric-textarea" placeholder="在此输入歌词，将按换行符、逗号和句号自动分割...&#10;启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）"></textarea>
-                        <button id="split-lyric-btn" class="action-btn">分割歌词</button>
+                        <div class="bilingual-switch">
+                            <label class="switch">
+                                <input type="checkbox" id="recognize-time-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="switch-label" data-i18n="enable_recognize_time">允许识别时间</span>
+                            <span class="tooltip-icon" data-i18n-title="recognize_time_tooltip" title="启用后将自动识别文本框中的时间码和元数据，并格式化为对应的时间标记与元数据"><i class="fas fa-question-circle"></i></span>
+                        </div>
+                        <textarea id="lyric-textarea" data-i18n-placeholder="lyric_textarea_placeholder" placeholder="在此输入歌词，将按换行符、逗号和句号自动分割...\n启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）"></textarea>
+                        <button id="split-lyric-btn" class="action-btn" data-i18n="split_lyric">分割歌词</button>
                     </div>
                     
                     <div id="lrc-upload-container" class="hidden">
                         <label for="lrc-upload" class="upload-label">
                             <i class="fas fa-file-import"></i>
-                            <span>上传LRC文件</span>
+                            <span data-i18n="upload_lrc">上传LRC文件</span>
                         </label>
                         <input type="file" id="lrc-upload" accept=".lrc">
                         
                         <div class="parsing-mode-container">
-                            <h3 id="parsing-mode-title">解析模式</h3>
+                            <h3 id="parsing-mode-title" data-i18n="parsing_mode">解析模式</h3>
                             <div class="radio-group">
                                 <label class="parsing-mode-label">
                                     <input type="radio" name="parsing-mode" value="default" checked>
-                                    <span id="default-mode-text">默认模式</span>
+                                    <span id="default-mode-text" data-i18n="default_mode">默认模式</span>
                                 </label>
                                 <label class="parsing-mode-label">
                                     <input type="radio" name="parsing-mode" value="strict">
-                                    <span id="strict-mode-text">严格模式</span>
+                                    <span id="strict-mode-text" data-i18n="strict_mode">严格模式</span>
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 字幕转换功能 -->
+                    <div id="subtitle-converter-container" class="hidden">
+                        <label for="subtitle-upload" class="upload-label">
+                            <i class="fas fa-file-export"></i>
+                            <span data-i18n="upload_subtitle">上传字幕文件</span>
+                        </label>
+                        <input type="file" id="subtitle-upload" accept=".srt,.vtt">
+                        <div class="subtitle-mode-container">
+                            <h3 data-i18n="subtitle_convert_mode">转换模式</h3>
+                            <div class="radio-group">
+                                <label class="subtitle-mode-label">
+                                    <input type="radio" name="subtitle-mode" value="text-only" checked>
+                                    <span data-i18n="subtitle_text_only">仅提取文本</span>
+                                </label>
+                                <label class="subtitle-mode-label">
+                                    <input type="radio" name="subtitle-mode" value="with-time">
+                                    <span data-i18n="subtitle_with_time">提取时间与文本</span>
+                                </label>
+                            </div>                            
+                        </div>
+                        <div class="supported-formats">
+                            <span class="format-badge">SRT</span>
+                            <span class="format-badge">VTT</span>
                         </div>
                     </div>
                 </div>
@@ -302,12 +337,13 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
-    <script src="js/audioHandler.js"></script>
-    <script src="js/lyricHandler.js"></script>
+    <script src="js/audioHandler.js?v=20250130"></script>
+    <script src="js/lyricHandler.js?v=20250130"></script>
     <script src="js/timeHandler.js"></script>
     <script src="js/uiController.js"></script>
     <script src="js/themeController.js"></script>
-    <script src="js/languageController.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/languageController.js?v=20250130"></script>
+    <script src="js/subtitleConverter.js?v=20250130"></script>
+    <script src="js/main.js?v=20250130"></script>
 </body>
 </html>

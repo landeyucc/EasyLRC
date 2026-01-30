@@ -224,7 +224,8 @@ const languageController = (() => {
         const noneTexts = document.querySelectorAll('#previous-lyric-text, #current-lyric-text, #next-lyric-text');
         noneTexts.forEach(el => {
             if (el && (el.textContent.trim() === '无' || el.textContent.trim() === '無' || el.textContent.trim() === 'None')) {
-                el.innerHTML = `<span class="lyric-time">[--:--:--]</span><span class="lyric-text">${data.none}</span>`;
+                const uninitializedTime = data.uninitialized_time || '[--:--]';
+                el.innerHTML = `<span class="lyric-time">${uninitializedTime}</span><span class="lyric-text">${data.none}</span>`;
             }
         });
         
@@ -327,9 +328,36 @@ const languageController = (() => {
         const githubLink = document.querySelector('.github-link');
         if (githubLink) githubLink.title = data.github_project;
         
+        // 更新字幕转换区域
+        const subtitleConvertBtn = document.querySelector('#subtitle-convert-btn');
+        if (subtitleConvertBtn) subtitleConvertBtn.textContent = data.convert_lrc;
+        
+        const subtitleUploadLabel = document.querySelector('#subtitle-converter-container .upload-label span');
+        if (subtitleUploadLabel) subtitleUploadLabel.textContent = data.upload_subtitle;
+        
+        const subtitleModeH3 = document.querySelector('#subtitle-converter-container .subtitle-mode-container h3');
+        if (subtitleModeH3) subtitleModeH3.textContent = data.subtitle_convert_mode;
+        
+        const subtitleModeLabels = document.querySelectorAll('#subtitle-converter-container .subtitle-mode-label span');
+        if (subtitleModeLabels && subtitleModeLabels.length >= 2) {
+            if (subtitleModeLabels[0]) subtitleModeLabels[0].textContent = data.subtitle_text_only;
+            if (subtitleModeLabels[1]) subtitleModeLabels[1].textContent = data.subtitle_with_time;
+        }
+        
         // 更新离开确认消息
-        window.onbeforeunload = () => {
-            return data.leave_confirm;
+        window.onbeforeunload = (e) => {
+            const textarea = document.getElementById('lyric-textarea');
+            const hasTextareaContent = textarea && textarea.value.trim().length > 0;
+            const hasAudio = typeof audioHandler !== 'undefined' && audioHandler.getAudioElement && audioHandler.getAudioElement().src;
+            const lyrics = typeof lyricHandler !== 'undefined' && lyricHandler.getLyrics ? lyricHandler.getLyrics() : [];
+            const hasLyrics = lyrics && lyrics.length > 0;
+            const hasProcessLyrics = lyrics && lyrics.some(l => l.time !== null);
+            
+            if (hasTextareaContent || hasAudio || hasLyrics || hasProcessLyrics) {
+                e.preventDefault();
+                e.returnValue = data.leave_confirm;
+                return data.leave_confirm;
+            }
         };
         
         // 保存当前语言到本地存储
