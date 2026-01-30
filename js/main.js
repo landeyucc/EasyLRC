@@ -230,6 +230,64 @@ $(document).ready(() => {
             return message;
         }
     });
+    
+    // 现代化提示框功能
+    function setupTooltips() {
+        document.querySelectorAll('.tooltip-icon').forEach(icon => {
+            let tooltipEl = null;
+            
+            icon.addEventListener('mouseenter', function() {
+                const tooltipKey = this.dataset.tooltip;
+                if (!tooltipKey) return;
+                
+                // 获取翻译文本或后备文本
+                let text = null;
+                try {
+                    text = typeof languageController.getText === 'function' ? languageController.getText(tooltipKey) : null;
+                } catch (e) {}
+                
+                if (!text || text === tooltipKey) {
+                    text = this.getAttribute('data-fallback-title') || '';
+                }
+                
+                if (!text) return;
+                
+                // 创建提示框元素
+                tooltipEl = document.createElement('div');
+                tooltipEl.className = 'custom-tooltip';
+                tooltipEl.textContent = text;
+                document.body.appendChild(tooltipEl);
+                
+                // 定位提示框
+                const rect = this.getBoundingClientRect();
+                const tooltipRect = tooltipEl.getBoundingClientRect();
+                
+                tooltipEl.style.position = 'fixed';
+                tooltipEl.style.left = (rect.left + rect.width / 2 - tooltipRect.width / 2) + 'px';
+                tooltipEl.style.top = (rect.top - tooltipRect.height - 8) + 'px';
+                
+                // 延迟显示动画
+                requestAnimationFrame(() => {
+                    tooltipEl.classList.add('show');
+                });
+            });
+            
+            icon.addEventListener('mouseleave', function() {
+                if (tooltipEl) {
+                    tooltipEl.classList.remove('show');
+                    setTimeout(() => {
+                        if (tooltipEl && tooltipEl.parentElement) {
+                            tooltipEl.parentElement.removeChild(tooltipEl);
+                        }
+                        tooltipEl = null;
+                    }, 250);
+                }
+            });
+        });
+    }
+    
+    // 延迟初始化提示框，确保语言已加载
+    setTimeout(setupTooltips, 300);
 });
 
 document.addEventListener('DOMContentLoaded', function() {

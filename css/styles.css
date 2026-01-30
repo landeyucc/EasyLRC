@@ -123,6 +123,54 @@ input:checked + .slider:before {
     margin-left: 5px;
     color: #666;
     cursor: help;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: rgba(128, 128, 128, 0.15);
+    transition: all 0.2s ease;
+}
+
+.tooltip-icon:hover {
+    background-color: rgba(128, 128, 128, 0.25);
+    color: var(--primary-color);
+}
+
+.tooltip-icon i {
+    font-size: 0.75rem;
+}
+
+/* 现代化自定义提示框 */
+.custom-tooltip {
+    position: fixed;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 400;
+    white-space: normal;
+    max-width: 280px;
+    min-width: 150px;
+    text-align: left;
+    line-height: 1.5;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15),
+                0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translateY(5px);
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.custom-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 /* 自定义音频播放器 */

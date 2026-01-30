@@ -171,11 +171,21 @@ const languageController = (() => {
         const lrcUploadBtn = document.querySelector('#lrc-upload-btn');
         if (lrcUploadBtn) lrcUploadBtn.textContent = data.import_lrc;
         
-        const switchLabel = document.querySelector('.switch-label');
-        if (switchLabel) switchLabel.textContent = data.enable_bilingual;
+        const switchLabels = document.querySelectorAll('.switch-label[data-i18n]');
+        switchLabels.forEach(label => {
+            const key = label.dataset.i18n;
+            if (data[key]) {
+                label.textContent = data[key];
+            }
+        });
         
-        const tooltipIcon = document.querySelector('.tooltip-icon');
-        if (tooltipIcon) tooltipIcon.title = data.bilingual_tooltip;
+        const tooltipIcons = document.querySelectorAll('.tooltip-icon');
+        tooltipIcons.forEach(icon => {
+            const iElement = icon.querySelector('i');
+            if (iElement && icon.dataset.i18nTitle && data[icon.dataset.i18nTitle]) {
+                icon.title = data[icon.dataset.i18nTitle];
+            }
+        });
         
         const lyricTextarea = document.querySelector('#lyric-textarea');
         if (lyricTextarea) lyricTextarea.placeholder = data.lyric_textarea_placeholder;

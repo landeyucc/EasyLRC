@@ -63,7 +63,7 @@
                                 <span class="slider round"></span>
                             </label>
                             <span class="switch-label" data-i18n="enable_bilingual">启用双语歌词</span>
-                            <span class="tooltip-icon" data-i18n-title="bilingual_tooltip" title="启用后：文本输入将单数行作为歌词，双数行作为翻译；导入LRC时将识别"/"后的内容或双行格式作为翻译"><i class="fas fa-question-circle"></i></span>
+                            <span class="tooltip-icon" data-tooltip="bilingual_tooltip" data-fallback-title="启用后：文本输入将单数行作为歌词，双数行作为翻译；导入LRC时将识别「/」后的内容或双行格式作为翻译"><i class="fas fa-question-circle"></i></span>
                         </div>
                         <div class="bilingual-switch">
                             <label class="switch">
@@ -71,7 +71,7 @@
                                 <span class="slider round"></span>
                             </label>
                             <span class="switch-label" data-i18n="enable_recognize_time">允许识别时间</span>
-                            <span class="tooltip-icon" data-i18n-title="recognize_time_tooltip" title="启用后将自动识别文本框中的时间码和元数据，并格式化为对应的时间标记与元数据"><i class="fas fa-question-circle"></i></span>
+                            <span class="tooltip-icon" data-tooltip="recognize_time_tooltip" data-fallback-title="启用后将自动识别文本框中的时间码和元数据，并格式化为对应的时间标记与元数据"><i class="fas fa-question-circle"></i></span>
                         </div>
                         <textarea id="lyric-textarea" data-i18n-placeholder="lyric_textarea_placeholder" placeholder="在此输入歌词，将按换行符、逗号和句号自动分割...\n启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）"></textarea>
                         <button id="split-lyric-btn" class="action-btn" data-i18n="split_lyric">分割歌词</button>
@@ -328,8 +328,6 @@
             </a>
         </div>
     </div>
-
-
 
     <!-- 消息提示容器 -->
     <div id="message-container" class="message-container"></div>
