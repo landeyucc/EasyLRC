@@ -695,7 +695,7 @@ input[type="file"] {
 #lyric-textarea {
     width: 100%;
     min-height: 150px;
-    max-height: 500px;
+    max-height: 500px; 
     height: auto;
     padding: 15px;
     border: none;
