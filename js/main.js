@@ -292,7 +292,7 @@ $(document).ready(() => {
 
 document.addEventListener('DOMContentLoaded', function() {
     const currentYear = new Date().getFullYear();
-    const footerText = `© ${currentYear} Github@<a href="https://github.com/landeyucc" target="_blank" title="GitHub">landeyucc</a>. Powered by <a href="https://coldsea.vip/" target="_blank" title="Coldsea">Coldsea Team</a> `;
+    const footerText = `© ${currentYear} <a href="https://github.com/landeyucc" target="_blank">@landeyucc</a>&nbsp;All rights reserved. <br/ >Powered by <a href="https://coldsea.vip/" target="_blank" style="text-decoration: none;"><span style="font-family: 'Frizon', sans-serif;">Coldsea</span></a>&nbsp;Team. `;
     const footerElements = document.querySelectorAll('.footer p');
     
     footerElements.forEach(function(footer) {

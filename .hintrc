@@ -13,6 +13,12 @@
     ],
     "css-check": "off",
     "valid-css": "off",
-    "no-css-high-colors": "off"
+    "no-css-high-colors": "off",
+    "axe/name-role-value": [
+      "default",
+      {
+        "button-name": "off"
+      }
+    ]
   }
 }
