@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="EasyLRC - 轻松制作同步歌词，支持逐行和逐字模式，LRC歌词编辑器，歌词时间轴工具，双语歌词制作">
-    <meta name="keywords" content="EasyLRC, LRC, 歌词制作, 同步歌词, 歌词编辑器, 歌词时间轴, 逐行歌词, 逐字歌词, 双语歌词, 歌词工具, 在线歌词">
-	<meta name="baidu-site-verification" content="codeva-xVGiiqAnmZ" />
+    <meta name="description" content="EasyLRC - 开源在线同步歌词制作工具，轻松制作精准的LRC格式歌词，支持逐行/逐字两种编辑模式，内置歌词时间轴校准功能，高效制作双语歌词，便捷、开箱即用的歌词编辑器。">
+    <meta name="keywords" content="EasyLRC, LRC, 歌词制作, 同步歌词, 歌词编辑器, 歌词时间轴, 逐行歌词, 逐字歌词, 双语歌词, 歌词工具, 在线歌词, 开源歌词工具, 歌词同步工具, LRC生成器, 歌词时间校准, 在线歌词制作, 歌词编辑工具, online lyrics editor, synchronized lyrics, bilingual lyrics maker, LRC editor, lyrics timeline, open source lyrics tool, open source LRC tool, lyrics synchronization tool, LRC generator, lyrics time calibration, online lyrics maker, lyrics editing tool, word-by-word lyrics, line-by-line lyrics">
+    <meta name="baidu-site-verification" content="codeva-xVGiiqAnmZ" />
     <title>EasyLRC</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -13,6 +14,7 @@
     <link rel="stylesheet" href="https://files-plus.coldsea.vip/spcoreapi/fonts/frizon.css">
     <link rel="shortcut icon" href="icon/EasyLRC.png" type="image/x-icon" sizes="16x16 32x32 64x64">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -57,7 +59,7 @@
                         <button id="lrc-upload-btn" class="option-btn" data-i18n="import_lrc">导入LRC</button>
                         <button id="subtitle-convert-btn" class="option-btn" data-i18n="convert_lrc">转换LRC</button>
                     </div>
-                    
+
                     <div id="text-input-container">
                         <div class="bilingual-switch">
                             <label class="switch">
@@ -65,7 +67,9 @@
                                 <span class="slider round"></span>
                             </label>
                             <span class="switch-label" data-i18n="enable_bilingual">启用双语歌词</span>
-                            <span class="tooltip-icon" data-tooltip="bilingual_tooltip" data-fallback-title="启用后：文本输入将单数行作为歌词，双数行作为翻译；导入LRC时将识别「/」后的内容或双行格式作为翻译"><i class="fas fa-question-circle"></i></span>
+                            <span class="tooltip-icon" data-tooltip="bilingual_tooltip"
+                                data-fallback-title="启用后：文本输入将单数行作为歌词，双数行作为翻译；导入LRC时将识别「/」后的内容或双行格式作为翻译"><i
+                                    class="fas fa-question-circle"></i></span>
                         </div>
                         <div class="bilingual-switch">
                             <label class="switch">
@@ -73,19 +77,22 @@
                                 <span class="slider round"></span>
                             </label>
                             <span class="switch-label" data-i18n="enable_recognize_time">允许识别时间</span>
-                            <span class="tooltip-icon" data-tooltip="recognize_time_tooltip" data-fallback-title="启用后将自动识别文本框中的时间码和元数据，并格式化为对应的时间标记与元数据"><i class="fas fa-question-circle"></i></span>
+                            <span class="tooltip-icon" data-tooltip="recognize_time_tooltip"
+                                data-fallback-title="启用后将自动识别文本框中的时间码和元数据，并格式化为对应的时间标记与元数据"><i
+                                    class="fas fa-question-circle"></i></span>
                         </div>
-                        <textarea id="lyric-textarea" data-i18n-placeholder="lyric_textarea_placeholder" placeholder="在此输入歌词，将按换行符、逗号和句号自动分割...\n启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）"></textarea>
+                        <textarea id="lyric-textarea" data-i18n-placeholder="lyric_textarea_placeholder"
+                            placeholder="在此输入歌词，将按换行符、逗号和句号自动分割...\n启用双语歌词后：单数行为歌词，双数行为翻译（可留空行）"></textarea>
                         <button id="split-lyric-btn" class="action-btn" data-i18n="split_lyric">分割歌词</button>
                     </div>
-                    
+
                     <div id="lrc-upload-container" class="hidden">
                         <label for="lrc-upload" class="upload-label">
                             <i class="fas fa-file-import"></i>
                             <span data-i18n="upload_lrc">上传LRC文件</span>
                         </label>
                         <input type="file" id="lrc-upload" accept=".lrc">
-                        
+
                         <div class="parsing-mode-container">
                             <h3 id="parsing-mode-title" data-i18n="parsing_mode">解析模式</h3>
                             <div class="radio-group">
@@ -100,7 +107,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- 字幕转换功能 -->
                     <div id="subtitle-converter-container" class="hidden">
                         <label for="subtitle-upload" class="upload-label">
@@ -119,7 +126,7 @@
                                     <input type="radio" name="subtitle-mode" value="with-time">
                                     <span data-i18n="subtitle_with_time">提取时间与文本</span>
                                 </label>
-                            </div>                            
+                            </div>
                         </div>
                         <div class="supported-formats">
                             <span class="format-badge">SRT</span>
@@ -147,13 +154,13 @@
                             </label>
                         </div>
                     </div>
-                    
+
                     <div class="timing-navigation">
                         <button id="stop-btn" class="control-btn"><i class="fas fa-undo"></i> 重置</button>
                         <button id="prev-lyric" class="control-btn"><i class="fas fa-step-backward"></i> 上一条</button>
                         <button id="next-lyric" class="control-btn"><i class="fas fa-step-forward"></i> 下一条</button>
                     </div>
-                    
+
                     <div class="lyric-context">
                         <div class="previous-lyric">
                             <span id="prev-lyric-label">上一歌词: </span>
@@ -168,14 +175,14 @@
                             <span id="next-lyric-text"></span>
                         </div>
                     </div>
-                    
+
                     <div class="timing-buttons">
                         <button id="prev-5s" class="control-btn"><i class="fas fa-backward-step"></i> 后退2秒</button>
                         <button id="next-5s" class="control-btn"><i class="fas fa-forward-step"></i> 前进2秒</button>
                         <button id="play-pause" class="control-btn primary"><i class="fas fa-play"></i> 播放/暂停</button>
                         <button id="set-time" class="control-btn accent"><i class="fas fa-marker"></i> 标记时间</button>
                     </div>
-                    
+
 
                 </div>
 
@@ -199,7 +206,8 @@
                         <button id="apply-adjustment" class="action-btn primary">应用调整</button>
                     </div>
                     <!-- 替换导出按钮为下一步按钮 -->
-                    <button id="next-step-btn" class="action-btn accent"><i class="fas fa-arrow-right"></i> 下一步：预览同步效果</button>
+                    <button id="next-step-btn" class="action-btn accent"><i class="fas fa-arrow-right"></i>
+                        下一步：预览同步效果</button>
                 </div>
             </section>
         </main>
@@ -209,7 +217,7 @@
             <section class="preview-main">
                 <div class="card">
                     <h2>歌词同步预览</h2>
-                                       
+
                     <!-- 音频播放器 -->
                     <div class="preview-audio">
                         <audio id="preview-audio-player" controls hidden></audio>
@@ -228,12 +236,15 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- 播放控制按钮 -->
                     <div class="preview-timing-buttons">
-                        <button id="preview-prev-2s" class="control-btn"><i class="fas fa-backward-step"></i> 后退2秒</button>
-                        <button id="preview-play-pause" class="control-btn primary"><i class="fas fa-play"></i> 播放/暂停</button>
-                        <button id="preview-next-2s" class="control-btn"><i class="fas fa-forward-step"></i> 前进2秒</button>
+                        <button id="preview-prev-2s" class="control-btn"><i class="fas fa-backward-step"></i>
+                            后退2秒</button>
+                        <button id="preview-play-pause" class="control-btn primary"><i class="fas fa-play"></i>
+                            播放/暂停</button>
+                        <button id="preview-next-2s" class="control-btn"><i class="fas fa-forward-step"></i>
+                            前进2秒</button>
                     </div>
 
                     <!-- 歌词同步显示区域 -->
@@ -242,7 +253,7 @@
                             <div class="placeholder-text">播放音频开始预览歌词同步效果</div>
                         </div>
                     </div>
-                    
+
                     <!-- 元数据模块 -->
                     <div class="metadata-container">
                         <div class="metadata-header">
@@ -309,9 +320,10 @@
                     <!-- 控制按钮 -->
                     <div class="preview-controls">
                         <button id="back-to-edit" class="action-btn"><i class="fas fa-arrow-left"></i> 上一步：返回编辑</button>
-                        <button id="export-lrc" class="action-btn accent"><i class="fas fa-download"></i> 导出LRC文件</button>
+                        <button id="export-lrc" class="action-btn accent"><i class="fas fa-download"></i>
+                            导出LRC文件</button>
                     </div>
-                    
+
                 </div>
             </section>
         </main>
@@ -325,7 +337,8 @@
             <button id="theme-toggle" class="floating-button theme-toggle" title="切换主题">
                 <i class="fas fa-moon"></i>
             </button>
-            <a href="https://github.com/landeyucc/EasyLRC" target="_blank" class="floating-button github-link" title="GitHub项目">
+            <a href="https://github.com/landeyucc/EasyLRC" target="_blank" class="floating-button github-link"
+                title="GitHub项目">
                 <i class="fab fa-github"></i>
             </a>
         </div>
@@ -333,7 +346,7 @@
 
     <!-- 消息提示容器 -->
     <div id="message-container" class="message-container"></div>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
@@ -346,4 +359,5 @@
     <script src="js/subtitleConverter.js?v=20250130"></script>
     <script src="js/main.js?v=20250130"></script>
 </body>
+
 </html>
