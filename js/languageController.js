@@ -462,6 +462,20 @@ const languageController = (() => {
 
     // 保存当前语言到本地存储
     localStorage.setItem("easyLRC_language", lang);
+
+    // 更新音频数据校验状态文本
+    const audioFixStatus = document.getElementById("audio-fix-status");
+    if (audioFixStatus && audioFixStatus.textContent) {
+      const currentText = audioFixStatus.textContent.trim();
+      // 根据当前文本更新为对应语言的文本
+      if (currentText === "分析中..." || currentText === "Analyzing...") {
+        audioFixStatus.textContent = data.analyzing || "分析中...";
+      } else if (currentText === "校正中..." || currentText === "Fixing...") {
+        audioFixStatus.textContent = data.fixing || "校正中...";
+      } else if (currentText === "完成" || currentText === "Completed") {
+        audioFixStatus.textContent = data.completed || "完成";
+      }
+    }
   };
 
   // 添加语言切换按钮
