@@ -2,300 +2,483 @@
  * 主入口模块：初始化所有模块，协调各模块工作
  */
 $(document).ready(() => {
-    // 初始化语言控制器
-    languageController.init();
-    
-    // 初始化UI
-    uiController.init();
-    
-    // 初始化歌词预览
-    lyricHandler.renderLyricPreview();
-    
-    // 初始化时禁用播放按钮（没有音频时）
-    if (typeof audioHandler !== 'undefined' && audioHandler.updatePlayButtonsState) {
-        audioHandler.updatePlayButtonsState(false);
-    }
-    
-    // 跟踪当前界面状态（编辑界面或预览界面）
-    window.isPreviewMode = false;
-    
-    // 处理模式切换事件
-    document.querySelector('input[name="process-mode"][value="line"]').addEventListener('change', function() {
-        if (this.checked) {
-            lyricHandler.setProcessMode('line');
-            // 启用双语歌词开关
-            document.getElementById('bilingual-toggle').disabled = false;
-        }
-    });
-    
-    document.querySelector('input[name="process-mode"][value="char"]').addEventListener('change', function() {
-        if (this.checked) {
-            lyricHandler.setProcessMode('char');
-            // 禁用双语歌词
-            document.getElementById('bilingual-toggle').checked = false;
-            document.getElementById('bilingual-toggle').disabled = true;
-        }
-    });
-    
-    // 绑定全局快捷键
-    $(document).on('keydown', function(e) {
-        // 忽略在输入框中的按键事件
-        if ($(e.target).is('input, textarea')) return;
-        
-        // 根据当前界面状态决定是否执行快捷键操作
-        
-        // Alt+O：打开文件选择（仅在编辑界面生效）
-        if (!window.isPreviewMode && e.altKey && e.key === 'o') {
-            e.preventDefault();
-            // 创建一个临时的文件输入元素
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = 'audio/*,.lrc,.txt,.srt,.vtt';
-            fileInput.style.display = 'none';
-            document.body.appendChild(fileInput);
-            
-            // 显示按键操作提示
-            uiController.showMessage({
-                message: languageController.getText('key_open_file'),
-                type: 'info',
-                duration: 2000
-            });
-            
-            // 监听文件选择事件
-            fileInput.addEventListener('change', function() {
-                if (this.files && this.files.length > 0) {
-                    const file = this.files[0];
-                    const fileName = file.name.toLowerCase();
-                    // 根据文件类型处理
-                    if (file.type.startsWith('audio/')) {
-                        audioHandler.handleAudioFile(file);
-                    } else if (fileName.endsWith('.lrc') || fileName.endsWith('.txt')) {
-                        lyricHandler.handleLyricFile(file);
-                    } else if (fileName.endsWith('.srt') || fileName.endsWith('.vtt')) {
-                        subtitleConverter.handleSubtitleFile(file);
-                    }
-                }
-                // 移除临时元素
-                document.body.removeChild(fileInput);
-            });
-            
-            // 触发点击事件
-            fileInput.click();
-        }
-        
-        // Alt+Enter：播放/暂停音频
-        if (e.altKey && e.key === 'Enter') {
-            e.preventDefault();
-            audioHandler.togglePlay();
-            
-            // 显示按键操作提示
-            uiController.showMessage({
-                message: languageController.getText('key_play_pause'),
-                type: 'info',
-                duration: 2000
-            });
-        }
-        
-        // B键：后退两秒
-        if (!e.altKey && e.key === 'b' || e.key === 'B') {
-            e.preventDefault();
-            audioHandler.seekRelative(-2);
-            
-            // 显示按键操作提示
-            uiController.showMessage({
-                message: languageController.getText('key_back_2s'),
-                type: 'info',
-                duration: 2000
-            });
-        }
-        
-        // N键：前进两秒
-        if (!e.altKey && e.key === 'n' || e.key === 'N') {
-            e.preventDefault();
-            audioHandler.seekRelative(2);
-            
-            // 显示按键操作提示
-            uiController.showMessage({
-                message: languageController.getText('key_forward_2s'),
-                type: 'info',
-                duration: 2000
-            });
-        }
-        
-        // Alt+B：切换上一个歌词（仅在编辑界面生效）
-        if (!window.isPreviewMode && e.altKey && (e.key === 'b' || e.key === 'B')) {
-            e.preventDefault();
-            lyricHandler.navigateLyric(-1);
-            
-            // 显示按键操作提示
-            uiController.showMessage({
-                message: languageController.getText('key_prev_lyric'),
-                type: 'info',
-                duration: 2000
-            });
-        }
-        
-        // Alt+N：切换下一个歌词（仅在编辑界面生效）
-        if (!window.isPreviewMode && e.altKey && (e.key === 'n' || e.key === 'N')) {
-            e.preventDefault();
-            lyricHandler.navigateLyric(1);
-            
-            // 显示按键操作提示
-            uiController.showMessage({
-                message: languageController.getText('key_next_lyric'),
-                type: 'info',
-                duration: 2000
-            });
-        }
-        
-        // 空格键：标记时间（仅在编辑界面生效）
-        if (!window.isPreviewMode && e.key === ' ') {
-            e.preventDefault();
-            lyricHandler.markCurrentLyricTime();
-            
-            // 显示按键操作提示
-            uiController.showMessage({
-                message: languageController.getText('key_mark_time'),
-                type: 'info',
-                duration: 2000
-            });
-        }
+  // 初始化语言控制器
+  languageController.init();
+
+  // 初始化UI
+  uiController.init();
+
+  // 初始化歌词预览
+  lyricHandler.renderLyricPreview();
+
+  // 初始化时禁用播放按钮（没有音频时）
+  if (
+    typeof audioHandler !== "undefined" &&
+    audioHandler.updatePlayButtonsState
+  ) {
+    audioHandler.updatePlayButtonsState(false);
+  }
+
+  // 跟踪当前界面状态（编辑界面或预览界面）
+  window.isPreviewMode = false;
+
+  // 处理模式切换事件
+  document
+    .querySelector('input[name="process-mode"][value="line"]')
+    .addEventListener("change", function () {
+      if (this.checked) {
+        lyricHandler.setProcessMode("line");
+        // 启用双语歌词开关
+        document.getElementById("bilingual-toggle").disabled = false;
+      }
     });
 
-    // 绑定字幕上传事件
-    $('#subtitle-upload').on('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
+  document
+    .querySelector('input[name="process-mode"][value="char"]')
+    .addEventListener("change", function () {
+      if (this.checked) {
+        lyricHandler.setProcessMode("char");
+        // 禁用双语歌词
+        document.getElementById("bilingual-toggle").checked = false;
+        document.getElementById("bilingual-toggle").disabled = true;
+      }
+    });
+
+  // 绑定全局快捷键
+  $(document).on("keydown", function (e) {
+    // 忽略在输入框中的按键事件
+    if ($(e.target).is("input, textarea")) return;
+
+    // 检查是否有音频和歌词
+    const hasAudio =
+      typeof audioHandler !== "undefined" &&
+      audioHandler.getAudioElement &&
+      audioHandler.getAudioElement().src;
+    const hasLyrics =
+      typeof lyricHandler !== "undefined" && lyricHandler.getLyrics
+        ? lyricHandler.getLyrics().length > 0
+        : false;
+
+    // 根据当前界面状态决定是否执行快捷键操作
+
+    // Alt+O：打开文件选择（仅在编辑界面生效）
+    if (!window.isPreviewMode && e.altKey && e.key === "o") {
+      e.preventDefault();
+      // 创建一个临时的文件输入元素
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "audio/*,.lrc,.txt,.srt,.vtt";
+      fileInput.style.display = "none";
+      document.body.appendChild(fileInput);
+
+      // 显示按键操作提示
+      uiController.showMessage({
+        message: languageController.getText("key_open_file"),
+        type: "info",
+        duration: 2000,
+      });
+
+      // 监听文件选择事件
+      fileInput.addEventListener("change", function () {
+        if (this.files && this.files.length > 0) {
+          const file = this.files[0];
+          const fileName = file.name.toLowerCase();
+          // 根据文件类型处理
+          if (file.type.startsWith("audio/")) {
+            audioHandler.handleAudioFile(file);
+          } else if (fileName.endsWith(".lrc") || fileName.endsWith(".txt")) {
+            lyricHandler.handleLyricFile(file);
+          } else if (fileName.endsWith(".srt") || fileName.endsWith(".vtt")) {
             subtitleConverter.handleSubtitleFile(file);
-            // 清空input以便重复选择同一文件
-            $(this).val('');
+          }
         }
-    });
-    
-    // 处理textarea手动调整高度
-    const textarea = document.getElementById('lyric-textarea');
-    if (textarea) {
-        let isManuallyResizing = false;
-        let manualHeight = null;
-        
-        textarea.addEventListener('mousedown', function(e) {
-            if (e.offsetY > textarea.clientHeight - 10) {
-                isManuallyResizing = true;
-                manualHeight = textarea.style.height;
-                textarea.classList.add('manual-resize');
-            }
-        });
-        
-        document.addEventListener('mouseup', function() {
-            if (isManuallyResizing) {
-                isManuallyResizing = false;
-                textarea.classList.remove('manual-resize');
-            }
-        });
-        
-        textarea.addEventListener('input', function() {
-            if (!isManuallyResizing) {
-                lyricHandler.autoResizeTextarea();
-            }
-        });
+        // 移除临时元素
+        document.body.removeChild(fileInput);
+      });
+
+      // 触发点击事件
+      fileInput.click();
     }
 
-    // 绑定识别时间开关事件
-    $('#recognize-time-toggle').on('change', function() {
-        const textarea = document.getElementById('lyric-textarea');
-        if (!textarea) return;
-        
-        if (this.checked) {
-            // 开启时：识别并格式化现有内容，保留在textarea中
-            const content = textarea.value;
-            const result = lyricHandler.recognizeTimeCodes(content);
-            textarea.value = result.formatted;
-            lyricHandler.autoResizeTextarea();
-        }
-    });
-    
-    // 绑定全局事件
-    $(window).on('beforeunload', (e) => {
-        const textarea = document.getElementById('lyric-textarea');
-        const hasTextareaContent = textarea && textarea.value.trim().length > 0;
-        const hasAudio = audioHandler.getAudioElement() && audioHandler.getAudioElement().src;
-        const lyrics = lyricHandler.getLyrics();
-        const hasLyrics = lyrics && lyrics.length > 0;
-        const hasProcessLyrics = lyrics && lyrics.some(l => l.time !== null);
-        
-        if (hasTextareaContent || hasAudio || hasLyrics || hasProcessLyrics) {
-            const message = languageController.getText('leave_confirm');
-            e.preventDefault();
-            e.returnValue = message;
-            return message;
-        }
-    });
-    
-    // 现代化提示框功能
-    function setupTooltips() {
-        document.querySelectorAll('.tooltip-icon').forEach(icon => {
-            let tooltipEl = null;
-            
-            icon.addEventListener('mouseenter', function() {
-                const tooltipKey = this.dataset.tooltip;
-                if (!tooltipKey) return;
-                
-                // 获取翻译文本或后备文本
-                let text = null;
-                try {
-                    text = typeof languageController.getText === 'function' ? languageController.getText(tooltipKey) : null;
-                } catch (e) {}
-                
-                if (!text || text === tooltipKey) {
-                    text = this.getAttribute('data-fallback-title') || '';
-                }
-                
-                if (!text) return;
-                
-                // 创建提示框元素
-                tooltipEl = document.createElement('div');
-                tooltipEl.className = 'custom-tooltip';
-                tooltipEl.textContent = text;
-                document.body.appendChild(tooltipEl);
-                
-                // 定位提示框
-                const rect = this.getBoundingClientRect();
-                const tooltipRect = tooltipEl.getBoundingClientRect();
-                
-                tooltipEl.style.position = 'fixed';
-                tooltipEl.style.left = (rect.left + rect.width / 2 - tooltipRect.width / 2) + 'px';
-                tooltipEl.style.top = (rect.top - tooltipRect.height - 8) + 'px';
-                
-                // 延迟显示动画
-                requestAnimationFrame(() => {
-                    tooltipEl.classList.add('show');
-                });
-            });
-            
-            icon.addEventListener('mouseleave', function() {
-                if (tooltipEl) {
-                    tooltipEl.classList.remove('show');
-                    setTimeout(() => {
-                        if (tooltipEl && tooltipEl.parentElement) {
-                            tooltipEl.parentElement.removeChild(tooltipEl);
-                        }
-                        tooltipEl = null;
-                    }, 250);
-                }
-            });
-        });
+    // Alt+Enter：播放/暂停音频（需要音频）
+    if (hasAudio && e.altKey && e.key === "Enter") {
+      e.preventDefault();
+      audioHandler.togglePlay();
+
+      // 显示按键操作提示
+      uiController.showMessage({
+        message: languageController.getText("key_play_pause"),
+        type: "info",
+        duration: 2000,
+      });
     }
-    
-    // 延迟初始化提示框，确保语言已加载
-    setTimeout(setupTooltips, 300);
+
+    // B键：后退两秒（需要音频）
+    if (hasAudio && ((!e.altKey && e.key === "b") || e.key === "B")) {
+      e.preventDefault();
+      audioHandler.seekRelative(-2);
+
+      // 显示按键操作提示
+      uiController.showMessage({
+        message: languageController.getText("key_back_2s"),
+        type: "info",
+        duration: 2000,
+      });
+    }
+
+    // N键：前进两秒（需要音频）
+    if (hasAudio && ((!e.altKey && e.key === "n") || e.key === "N")) {
+      e.preventDefault();
+      audioHandler.seekRelative(2);
+
+      // 显示按键操作提示
+      uiController.showMessage({
+        message: languageController.getText("key_forward_2s"),
+        type: "info",
+        duration: 2000,
+      });
+    }
+
+    // Alt+B：切换上一个歌词（仅在编辑界面生效，需要歌词）
+    if (
+      !window.isPreviewMode &&
+      hasLyrics &&
+      e.altKey &&
+      (e.key === "b" || e.key === "B")
+    ) {
+      e.preventDefault();
+      lyricHandler.navigateLyric(-1);
+
+      // 显示按键操作提示
+      uiController.showMessage({
+        message: languageController.getText("key_prev_lyric"),
+        type: "info",
+        duration: 2000,
+      });
+    }
+
+    // Alt+N：切换下一个歌词（仅在编辑界面生效，需要歌词）
+    if (
+      !window.isPreviewMode &&
+      hasLyrics &&
+      e.altKey &&
+      (e.key === "n" || e.key === "N")
+    ) {
+      e.preventDefault();
+      lyricHandler.navigateLyric(1);
+
+      // 显示按键操作提示
+      uiController.showMessage({
+        message: languageController.getText("key_next_lyric"),
+        type: "info",
+        duration: 2000,
+      });
+    }
+
+    // 空格键：标记时间（仅在编辑界面生效，需要歌词）
+    if (!window.isPreviewMode && hasLyrics && e.key === " ") {
+      e.preventDefault();
+      lyricHandler.markCurrentLyricTime();
+
+      // 显示按键操作提示
+      uiController.showMessage({
+        message: languageController.getText("key_mark_time"),
+        type: "info",
+        duration: 2000,
+      });
+    }
+
+    // 上方向键：切换上一句歌词（需要歌词）
+    if (hasLyrics && e.key === "ArrowUp") {
+      e.preventDefault();
+      if (window.isPreviewMode) {
+        // 预览界面：切换同步预览歌词
+        lyricHandler.navigateSyncLyric(-1);
+        uiController.showMessage({
+          message: languageController.getText("key_prev_lyric"),
+          type: "info",
+          duration: 2000,
+        });
+      } else {
+        // 编辑界面：切换歌词预览
+        lyricHandler.navigateLyric(-1);
+        uiController.showMessage({
+          message: languageController.getText("key_prev_lyric"),
+          type: "info",
+          duration: 2000,
+        });
+      }
+    }
+
+    // 下方向键：切换下一句歌词（需要歌词）
+    if (hasLyrics && e.key === "ArrowDown") {
+      e.preventDefault();
+      if (window.isPreviewMode) {
+        // 预览界面：切换同步预览歌词
+        lyricHandler.navigateSyncLyric(1);
+        uiController.showMessage({
+          message: languageController.getText("key_next_lyric"),
+          type: "info",
+          duration: 2000,
+        });
+      } else {
+        // 编辑界面：切换歌词预览
+        lyricHandler.navigateLyric(1);
+        uiController.showMessage({
+          message: languageController.getText("key_next_lyric"),
+          type: "info",
+          duration: 2000,
+        });
+      }
+    }
+
+    // 左方向键：精细调整当前歌词时间（仅编辑界面，需要歌词）
+    if (!window.isPreviewMode && hasLyrics && e.key === "ArrowLeft") {
+      e.preventDefault();
+      // 每次调整 -0.2秒（200毫秒）
+      lyricHandler.adjustCurrentLyricTime(-0.2);
+      uiController.showMessage({
+        message: languageController.getText("key_adjust_time_left"),
+        type: "info",
+        duration: 1500,
+      });
+    }
+
+    // 右方向键：精细调整当前歌词时间（仅编辑界面，需要歌词）
+    if (!window.isPreviewMode && hasLyrics && e.key === "ArrowRight") {
+      e.preventDefault();
+      // 每次调整 +0.2秒（200毫秒）
+      lyricHandler.adjustCurrentLyricTime(0.2);
+      uiController.showMessage({
+        message: languageController.getText("key_adjust_time_right"),
+        type: "info",
+        duration: 1500,
+      });
+    }
+
+    // Alt+M：切换左侧面板显示/隐藏
+    if (e.altKey && (e.key === "m" || e.key === "M")) {
+      e.preventDefault();
+      const isMobile = window.innerWidth <= 768;
+      if (!isMobile) {
+        const inputPanel = document.getElementById("input-panel");
+        const expandBtn = document.getElementById("expand-input-panel-btn");
+        if (inputPanel && expandBtn) {
+          const isCollapsed = inputPanel.classList.contains("collapsed");
+          if (isCollapsed) {
+            // 展开左侧面板
+            inputPanel.classList.remove("collapsed");
+            expandBtn.classList.add("hidden");
+            document
+              .querySelector("main")
+              .classList.remove("input-panel-collapsed");
+            // 显示按键操作提示
+            uiController.showMessage({
+              message:
+                languageController.getText("key_left_panel_expanded") ||
+                "已展开左侧面板",
+              type: "info",
+              duration: 2000,
+            });
+          } else {
+            // 折叠左侧面板
+            inputPanel.classList.add("collapsed");
+            expandBtn.classList.remove("hidden");
+            document
+              .querySelector("main")
+              .classList.add("input-panel-collapsed");
+            // 显示按键操作提示
+            uiController.showMessage({
+              message:
+                languageController.getText("key_left_panel_collapsed") ||
+                "已折叠左侧面板",
+              type: "info",
+              duration: 2000,
+            });
+          }
+        }
+      }
+    }
+  });
+
+  // 绑定字幕上传事件
+  $("#subtitle-upload").on("change", function (e) {
+    const file = e.target.files[0];
+    if (file) {
+      subtitleConverter.handleSubtitleFile(file);
+      // 清空input以便重复选择同一文件
+      $(this).val("");
+    }
+  });
+
+  // 处理textarea手动调整高度
+  const textarea = document.getElementById("lyric-textarea");
+  if (textarea) {
+    let isManuallyResizing = false;
+    let manualHeight = null;
+
+    textarea.addEventListener("mousedown", function (e) {
+      if (e.offsetY > textarea.clientHeight - 10) {
+        isManuallyResizing = true;
+        manualHeight = textarea.style.height;
+        textarea.classList.add("manual-resize");
+      }
+    });
+
+    document.addEventListener("mouseup", function () {
+      if (isManuallyResizing) {
+        isManuallyResizing = false;
+        textarea.classList.remove("manual-resize");
+      }
+    });
+
+    textarea.addEventListener("input", function () {
+      if (!isManuallyResizing) {
+        lyricHandler.autoResizeTextarea();
+      }
+    });
+  }
+
+  // 绑定识别时间开关事件
+  $("#recognize-time-toggle").on("change", function () {
+    const textarea = document.getElementById("lyric-textarea");
+    if (!textarea) return;
+
+    if (this.checked) {
+      // 开启时：识别并格式化现有内容，保留在textarea中
+      const content = textarea.value;
+      const result = lyricHandler.recognizeTimeCodes(content);
+      textarea.value = result.formatted;
+      lyricHandler.autoResizeTextarea();
+    }
+  });
+
+  // 绑定全局事件
+  $(window).on("beforeunload", (e) => {
+    const textarea = document.getElementById("lyric-textarea");
+    const hasTextareaContent = textarea && textarea.value.trim().length > 0;
+    const hasAudio =
+      audioHandler.getAudioElement() && audioHandler.getAudioElement().src;
+    const lyrics = lyricHandler.getLyrics();
+    const hasLyrics = lyrics && lyrics.length > 0;
+    const hasProcessLyrics = lyrics && lyrics.some((l) => l.time !== null);
+
+    if (hasTextareaContent || hasAudio || hasLyrics || hasProcessLyrics) {
+      const message = languageController.getText("leave_confirm");
+      e.preventDefault();
+      e.returnValue = message;
+      return message;
+    }
+  });
+
+  // 现代化提示框功能
+  function setupTooltips() {
+    document.querySelectorAll(".tooltip-icon").forEach((icon) => {
+      let tooltipEl = null;
+
+      icon.addEventListener("mouseenter", function () {
+        const tooltipKey = this.dataset.tooltip;
+        if (!tooltipKey) return;
+
+        // 获取翻译文本或后备文本
+        let text = null;
+        try {
+          text =
+            typeof languageController.getText === "function"
+              ? languageController.getText(tooltipKey)
+              : null;
+        } catch (e) {}
+
+        if (!text || text === tooltipKey) {
+          text = this.getAttribute("data-fallback-title") || "";
+        }
+
+        if (!text) return;
+
+        // 创建提示框元素
+        tooltipEl = document.createElement("div");
+        tooltipEl.className = "custom-tooltip";
+        tooltipEl.textContent = text;
+        document.body.appendChild(tooltipEl);
+
+        // 定位提示框
+        const rect = this.getBoundingClientRect();
+        const tooltipRect = tooltipEl.getBoundingClientRect();
+
+        tooltipEl.style.position = "fixed";
+        tooltipEl.style.left =
+          rect.left + rect.width / 2 - tooltipRect.width / 2 + "px";
+        tooltipEl.style.top = rect.top - tooltipRect.height - 8 + "px";
+
+        // 延迟显示动画
+        requestAnimationFrame(() => {
+          tooltipEl.classList.add("show");
+        });
+      });
+
+      icon.addEventListener("mouseleave", function () {
+        if (tooltipEl) {
+          tooltipEl.classList.remove("show");
+          setTimeout(() => {
+            if (tooltipEl && tooltipEl.parentElement) {
+              tooltipEl.parentElement.removeChild(tooltipEl);
+            }
+            tooltipEl = null;
+          }, 250);
+        }
+      });
+    });
+  }
+
+  // 延迟初始化提示框，确保语言已加载
+  setTimeout(setupTooltips, 300);
+
+  const isMobile = window.innerWidth <= 768;
+
+  if (!isMobile) {
+    const inputPanel = document.getElementById("input-panel");
+    const collapseBtn = document.getElementById("collapse-input-panel-btn");
+    const expandBtn = document.getElementById("expand-input-panel-btn");
+
+    if (collapseBtn && expandBtn && inputPanel) {
+      collapseBtn.addEventListener("click", function () {
+        inputPanel.classList.add("collapsed");
+        expandBtn.classList.remove("hidden");
+        document.querySelector("main").classList.add("input-panel-collapsed");
+      });
+
+      expandBtn.addEventListener("click", function () {
+        inputPanel.classList.remove("collapsed");
+        expandBtn.classList.add("hidden");
+        document
+          .querySelector("main")
+          .classList.remove("input-panel-collapsed");
+      });
+    }
+  }
+
+  window.addEventListener("resize", function () {
+    const isMobileNow = window.innerWidth <= 768;
+    const inputPanel = document.getElementById("input-panel");
+    const collapseBtn = document.getElementById("collapse-input-panel-btn");
+    const expandBtn = document.getElementById("expand-input-panel-btn");
+
+    if (isMobileNow) {
+      if (inputPanel) inputPanel.classList.remove("collapsed");
+      if (collapseBtn) collapseBtn.style.display = "none";
+      if (expandBtn) expandBtn.classList.add("hidden");
+    } else if (collapseBtn && expandBtn && inputPanel) {
+      collapseBtn.style.display = "flex";
+    }
+  });
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const currentYear = new Date().getFullYear();
-    const footerText = `© ${currentYear} <a href="https://github.com/landeyucc" target="_blank">@landeyucc</a>&nbsp;All rights reserved. <br/ >Powered by <a href="https://coldsea.vip/" target="_blank" style="text-decoration: none;"><span style="font-family: 'Frizon', sans-serif;">Coldsea</span></a>&nbsp;Team. `;
-    const footerElements = document.querySelectorAll('.footer p');
-    
-    footerElements.forEach(function(footer) {
-        footer.innerHTML = footerText;
-    });
+document.addEventListener("DOMContentLoaded", function () {
+  const currentYear = new Date().getFullYear();
+  const footerText = `© ${currentYear} <a href="https://github.com/landeyucc" target="_blank">@landeyucc</a>&nbsp;All rights reserved. <br/ >Powered by <a href="https://coldsea.vip/" target="_blank" style="text-decoration: none;"><span style="font-family: 'Frizon', sans-serif;">Coldsea</span></a>&nbsp;Team. `;
+  const footerElements = document.querySelectorAll(".footer p");
+
+  footerElements.forEach(function (footer) {
+    footer.innerHTML = footerText;
+  });
 });

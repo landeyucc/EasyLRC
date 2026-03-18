@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="EasyLRC - 开源在线同步歌词制作工具，轻松制作精准的LRC格式歌词，支持逐行/逐字两种编辑模式，内置歌词时间轴校准功能，高效制作双语歌词，便捷、开箱即用的歌词编辑器。">
-    <meta name="keywords" content="EasyLRC, LRC, 歌词制作, 同步歌词, 歌词编辑器, 歌词时间轴, 逐行歌词, 逐字歌词, 双语歌词, 歌词工具, 在线歌词, 开源歌词工具, 歌词同步工具, LRC生成器, 歌词时间校准, 在线歌词制作, 歌词编辑工具, online lyrics editor, synchronized lyrics, bilingual lyrics maker, LRC editor, lyrics timeline, open source lyrics tool, open source LRC tool, lyrics synchronization tool, LRC generator, lyrics time calibration, online lyrics maker, lyrics editing tool, word-by-word lyrics, line-by-line lyrics">
+    <meta name="description"
+        content="EasyLRC - 开源在线同步歌词制作工具，轻松制作精准的LRC格式歌词，支持逐行/逐字两种编辑模式，内置歌词时间轴校准功能，高效制作双语歌词，便捷、开箱即用的歌词编辑器。">
+    <meta name="keywords"
+        content="EasyLRC, LRC, 歌词制作, 同步歌词, 歌词编辑器, 歌词时间轴, 逐行歌词, 逐字歌词, 双语歌词, 歌词工具, 在线歌词, 开源歌词工具, 歌词同步工具, LRC生成器, 歌词时间校准, 在线歌词制作, 歌词编辑工具, online lyrics editor, synchronized lyrics, bilingual lyrics maker, LRC editor, lyrics timeline, open source lyrics tool, open source LRC tool, lyrics synchronization tool, LRC generator, lyrics time calibration, online lyrics maker, lyrics editing tool, word-by-word lyrics, line-by-line lyrics">
     <meta name="baidu-site-verification" content="codeva-xVGiiqAnmZ" />
     <title>EasyLRC</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,7 +27,11 @@
         <!-- 原编辑界面 -->
         <main id="edit-interface">
             <!-- 左侧输入区域 -->
-            <section class="input-panel">
+            <section class="input-panel" id="input-panel">
+                <!-- 折叠按钮 -->
+                <button id="collapse-input-panel-btn" class="collapse-panel-btn">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
                 <div class="card">
                     <h2>音频文件</h2>
                     <div class="audio-upload">
@@ -35,20 +41,6 @@
                         </label>
                         <input type="file" id="audio-upload" accept="audio/*">
                         <audio id="audio-player" controls hidden></audio>
-                        <!-- 自定义音频播放器 -->
-                        <div class="custom-audio-player" id="main-audio-player">
-                            <div class="audio-progress-bar">
-                                <div class="progress-track">
-                                    <div class="progress-fill"></div>
-                                    <div class="progress-handle"></div>
-                                </div>
-                                <div class="time-display">
-                                    <span class="current-time">00:00.00</span>
-                                    <span class="separator">/</span>
-                                    <span class="total-time">00:00.00</span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -111,7 +103,7 @@
                     <!-- 字幕转换功能 -->
                     <div id="subtitle-converter-container" class="hidden">
                         <label for="subtitle-upload" class="upload-label">
-                            <i class="fas fa-file-export"></i>
+                            <i class="fas fa-file-import"></i>
                             <span data-i18n="upload_subtitle">上传字幕文件</span>
                         </label>
                         <input type="file" id="subtitle-upload" accept=".srt,.vtt">
@@ -136,6 +128,11 @@
                 </div>
             </section>
 
+            <!-- 左侧面板折叠按钮 -->
+            <button id="expand-input-panel-btn" class="expand-panel-btn hidden">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
+
             <!-- 右侧预览和处理区域 -->
             <section class="preview-panel">
                 <!-- 打节奏控制区域 -->
@@ -159,6 +156,21 @@
                         <button id="stop-btn" class="control-btn"><i class="fas fa-undo"></i> 重置</button>
                         <button id="prev-lyric" class="control-btn"><i class="fas fa-step-backward"></i> 上一条</button>
                         <button id="next-lyric" class="control-btn"><i class="fas fa-step-forward"></i> 下一条</button>
+                    </div>
+
+                    <!-- 自定义音频播放器 -->
+                    <div class="custom-audio-player" id="main-audio-player">
+                        <div class="audio-progress-bar">
+                            <div class="progress-track">
+                                <div class="progress-fill"></div>
+                                <div class="progress-handle"></div>
+                            </div>
+                            <div class="time-display">
+                                <span class="current-time">00:00.00</span>
+                                <span class="separator">/</span>
+                                <span class="total-time">00:00.00</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="lyric-context">
@@ -200,12 +212,54 @@
 
                 <div class="card" id="adjustment-panel">
                     <h2>时间调整</h2>
-                    <p>调整所有时间码（秒.毫秒，如: 0.500 或 -0.200）</p>
+                    <p>调整所有时间码</p>
                     <div class="adjustment-controls">
-                        <input type="text" id="time-adjust" placeholder="输入调整值">
+                        <input type="text" id="time-adjust" placeholder="输入调整值（秒.毫秒，如: 0.500 或 -0.200）">
                         <button id="apply-adjustment" class="action-btn primary">应用调整</button>
                     </div>
-                    <!-- 替换导出按钮为下一步按钮 -->
+                    <!-- 音频数据校验时间按钮 -->
+                    <div class="audio-fix-buttons">
+                        <button id="audio-fix-time-btn" class="action-btn primary"><i class="fas fa-wave-square"></i>
+                            <span data-i18n="audio_fix_time">音频数据校验时间</span></button>
+                        <button id="undo-fix-time-btn" class="action-btn"><i class="fas fa-undo"></i>
+                            <span data-i18n="undo_fix_time">撤销校验时间</span></button>
+                    </div>
+                    <!-- 音频分析结果显示区域 -->
+                    <div id="audio-fix-result" class="audio-fix-result hidden">
+                        <div class="audio-info-display">
+                            <div class="audio-info-item">
+                                <span class="info-label" data-i18n="audio_sample_rate">采样率:</span>
+                                <span id="audio-sample-rate" class="info-value">--</span>
+                            </div>
+                            <div class="audio-info-item">
+                                <span class="info-label" data-i18n="audio_duration">时长:</span>
+                                <span id="audio-duration" class="info-value">--</span>
+                            </div>
+                            <div class="audio-info-item">
+                                <span class="info-label" data-i18n="audio_processing_status">处理状态:</span>
+                                <span id="audio-fix-status" class="info-value">--</span>
+                            </div>
+                        </div>
+                        <div class="waveform-container">
+                            <canvas id="waveform-canvas"></canvas>
+                        </div>
+                        <div class="fix-results-scroll">
+                            <table class="fix-results-table">
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="result_index">序号</th>
+                                        <th data-i18n="original_time">原始时间</th>
+                                        <th data-i18n="fixed_time">校正时间</th>
+                                        <th data-i18n="peak_position">峰值位置</th>
+                                        <th data-i18n="peak_intensity">峰值强度</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fix-results-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- 下一步按钮 -->
                     <button id="next-step-btn" class="action-btn accent"><i class="fas fa-arrow-right"></i>
                         下一步：预览同步效果</button>
                 </div>
@@ -357,6 +411,7 @@
     <script src="js/uiController.js"></script>
     <script src="js/themeController.js"></script>
     <script src="js/subtitleConverter.js?v=20250130"></script>
+    <script src="js/audioFixTime.js"></script>
     <script src="js/main.js?v=20250130"></script>
 </body>
 

@@ -2,188 +2,223 @@
  * English language pack
  */
 const en_US = {
-    // Page title
-    "title": "EasyLRC",
-    "subtitle": "Create synchronized lyrics easily, supporting line-by-line and character-by-character modes",
-    
-    // Lyric Context
-    noLyric: 'N/A',
+  // Page title
+  title: "EasyLRC",
+  subtitle:
+    "Create synchronized lyrics easily, supporting line-by-line and character-by-character modes",
 
-    // Confirmation Dialog
-    confirmOperationTitle: 'Confirm Operation',
-    confirmOperationMessage: 'Are you sure you want to perform this action?',
-    confirmText: 'Confirm',
-    cancelText: 'Cancel',
+  // Lyric Context
+  noLyric: "N/A",
 
-    // Prompt Dialog
-    promptInputTitle: 'Please Enter',
-    timeInputLabel: 'Time (min:sec.hundredths):',
-    translationInputLabel: 'Translation:',
-    lyricContentLabel: 'Lyric Content:',
-    tipTitle: 'Tip',
-    uploadAudioAndTagLyrics: 'Please upload audio and complete lyric time tagging first',
-    noLyricData: 'No lyric data',
-    noValidTimedLyrics: 'No valid timed lyrics found',
+  // Confirmation Dialog
+  confirmOperationTitle: "Confirm Operation",
+  confirmOperationMessage: "Are you sure you want to perform this action?",
+  confirmText: "Confirm",
+  cancelText: "Cancel",
 
-    // Metadata
-    metaArtist: 'Artist',
-    metaTitle: 'Song Title',
-    metaAlbum: 'Album',
-    metaLyricCreator: 'Lyric Creator/Editor',
-    metaOffset: 'Time Offset',
-    metaLength: 'Song Length',
-    metaSinger: 'Singer',
-    metaArranger: 'Arranger',
-    metaVersion: 'Version Info',
-    metaComposer: 'Composer',
-    metaLyricist: 'Lyricist',
-    metaTranslator: 'Translator',
-    metaLanguage: 'Lyric Language',
+  // Prompt Dialog
+  promptInputTitle: "Please Enter",
+  timeInputLabel: "Time (min:sec.hundredths):",
+  translationInputLabel: "Translation:",
+  lyricContentLabel: "Lyric Content:",
+  tipTitle: "Tip",
+  uploadAudioAndTagLyrics:
+    "Please upload audio and complete lyric time tagging first",
+  noLyricData: "No lyric data",
+  noValidTimedLyrics: "No valid timed lyrics found",
 
-    // Lyric Edit/Delete/Jump
-    editLyricTitle: 'Edit Lyric',
-    editLyricMessage: 'Please edit the lyric content:',
-    confirmDeleteTitle: 'Confirm Deletion',
-    confirmDeleteMessage: 'Are you sure you want to delete this lyric?',
-    operationSuccessTitle: 'Operation Successful',
-    lyricDeletedMessage: 'Lyric deleted',
-    jumpToLyric: 'Jumped to lyric {index}',
-    
-    // Bilingual lyrics
-    bilingual_enabled_title: 'Bilingual Lyrics Enabled',
-    bilingual_enabled_message: 'Text Input: Odd lines are lyrics, even lines are translations\nLRC Import: Content after "/" will be recognized as translation',
+  // Metadata
+  metaArtist: "Artist",
+  metaTitle: "Song Title",
+  metaAlbum: "Album",
+  metaLyricCreator: "Lyric Creator/Editor",
+  metaOffset: "Time Offset",
+  metaLength: "Song Length",
+  metaSinger: "Singer",
+  metaArranger: "Arranger",
+  metaVersion: "Version Info",
+  metaComposer: "Composer",
+  metaLyricist: "Lyricist",
+  metaTranslator: "Translator",
+  metaLanguage: "Lyric Language",
 
-    // File Detection
-    audioFileDetected: 'Detected {count} audio files, only loading the first one',
-    lyricFileDetected: 'Detected {count} lyric files, only loading the first one',
+  // Lyric Edit/Delete/Jump
+  editLyricTitle: "Edit Lyric",
+  editLyricMessage: "Please edit the lyric content:",
+  confirmDeleteTitle: "Confirm Deletion",
+  confirmDeleteMessage: "Are you sure you want to delete this lyric?",
+  operationSuccessTitle: "Operation Successful",
+  lyricDeletedMessage: "Lyric deleted",
+  jumpToLyric: "Jumped to lyric {index}",
 
-    // Audio file area
-    "audio_file": "Audio File",
-    "drop_to_upload": "Drop to Upload",
-    "lyricInputTitle": "Lyric Input",
-    "upload_audio": "Upload Audio File",
-    
-    // Lyric input area
-    "lyric_input": "Lyric Input",
-    "text_input": "Text Input",
-    "import_lrc": "Import LRC",
-    "enable_bilingual": "Enable Bilingual Lyrics",
-    "bilingual_tooltip": "When enabled: Text input will use odd lines as lyrics and even lines as translations; When importing LRC, content after \"/\" or in double-line format will be recognized as translations.",
-    "enable_recognize_time": "Allow Time Recognition",
-    "recognize_time_tooltip": "When enabled, timecodes and metadata in the textarea will be automatically recognized and formatted into corresponding time tags.",
-    "timecodes_imported": "Imported {count} timed lyrics",
-    "no_timecodes_found": "No timecodes found",
-    "lyric_textarea_placeholder": "Enter lyrics here, they will be automatically split by line break, commas, and periods...\nWhen bilingual lyrics are enabled: odd lines are lyrics, even lines are translations (empty lines allowed)",
-    "split_lyric": "Split Lyrics",
-    "upload_lrc": "Upload LRC File",
-    "parsing_mode": "Parsing Mode",
-    "default_mode": "Default Mode (Parse by original LRC line order)",
-    "strict_mode": "Strict Mode (Import by timecode sorting)",
-    
-    // Subtitle converter feature
-    "convert_lrc": "Convert LRC",
-    "convert_lrc_desc": "Convert SRT or VTT subtitle files to LRC format",
-    "upload_subtitle": "Upload Subtitle File",
-    "supported_formats": "Supported Formats",
-    "srt_format": "SRT",
-    "vtt_format": "VTT",
-    "convert_success": "Successfully converted {count} subtitles to LRC format",
-    "subtitle_text_extracted": "Extracted {count} subtitle texts",
-    "subtitle_imported_with_time": "Imported {count} timed lyrics",
-    "subtitle_fallback_text_only": "Module not loaded, fell back to text mode",
-    "subtitle_convert_mode": "Convert Mode",
-    "subtitle_text_only": "Extract Text Only",
-    "subtitle_with_time": "Extract Time and Text",
-    "parse_srt_error": "Cannot parse SRT file, please check the file format",
-    "parse_vtt_error": "Cannot parse VTT file, please check the file format",
-    "handle_subtitle_error": "Error processing subtitle file: {error}",
-    "unsupported_format": "Unsupported file format, please upload SRT or VTT file",
-    
-    // Timing control area
-    "timing_controls": "Timing Controls",
-    "process_mode": "Processing Mode",
-    "line_mode": "Line-by-Line",
-    "char_mode": "Character-by-Character",
-    "reset": "Reset",
-    "prev_lyric": "Previous",
-    "next_lyric": "Next",
-    "prev_lyric_text": "LEFT LRC :",
-    "current_lyric_text": "CURRENT:",
-    "next_lyric_text": "NEXT LRC:",
-    "none": "None",
-    "uninitialized_time": "[--:--.--]",
-    "back_2s": "Back 2s",
-    "forward_2s": "Forward 2s",
-    "play_pause": "Play/Pause",
-    "mark_time": "Mark Time",
-    
-    // Lyric preview area
-    "lyric_preview": "Lyric Preview",
-    "lyric_preview_placeholder": "Please enter lyrics and split them, or import an LRC file",
-    "add_blank_lyric": "Add Blank Lyric",
-    
-    // Time adjustment area
-    "time_adjustment": "Time Adjustment",
-    "adjustment_desc": "Adjust all timestamps (seconds.milliseconds, e.g.: 0.500 or -0.200)",
-    "adjustment_placeholder": "Enter adjustment value",
-    "apply_adjustment": "Apply Adjustment",
-    "next_step": "Next Step: Preview Sync Effect",
-    
-    // Preview interface
-    "sync_preview": "Lyric Sync Preview",
-    "sync_preview_placeholder": "Play audio to start previewing lyric synchronization effect",
-    "back_to_edit": "Previous Step: Return to Edit",
-    "export_lrc": "Export LRC File",
-    
-    // Metadata area
-    "lyric_metadata": "Lyric Metadata",
-    "meta_ar": "[ar] Artist:",
-    "meta_ar_placeholder": "Artist name",
-    "meta_ti": "[ti] Title:",
-    "meta_ti_placeholder": "Song title",
-    "meta_al": "[al] Album:",
-    "meta_al_placeholder": "Album name",
-    "meta_by": "[by] Creator/Editor:",
-    "meta_by_placeholder": "Creator name",
-    "meta_offset": "[offset] Time Offset (ms):",
-    "meta_offset_placeholder": "0",
-    "meta_length": "[length] Total Duration:",
-    "meta_length_placeholder": "00:00.00",
-    "meta_au": "[au] Singer:",
-    "meta_au_placeholder": "Singer name",
-    "meta_re": "[re] Arranger:",
-    "meta_re_placeholder": "Arranger name",
-    "meta_ve": "[ve] Version Info:",
-    "meta_ve_placeholder": "Version number or description",
-    "meta_composer": "[composer] Composer:",
-    "meta_composer_placeholder": "Composer name",
-    "meta_lyricist": "[lyricist] Lyricist:",
-    "meta_lyricist_placeholder": "Lyricist name",
-    "meta_translator": "[translator] Translator:",
-    "meta_translator_placeholder": "Translator name",
-    "meta_language": "[language] Lyric Language:",
-    "meta_language_placeholder": "Language name",
-    
-    // Floating buttons
-    "toggle_theme": "Toggle Theme",
-    "github_project": "GitHub Project",
-    
-    // Message prompts
-    "message_title": "Notice",
-    "leave_confirm": "You are editing lyrics. Are you sure you want to leave?",
-    
-    // Key operation prompts
-    "key_open_file": "File selection dialog triggered",
-    "key_play_pause": "Play/Pause toggled",
-    "key_back_2s": "Moved back 2 seconds",
-    "key_forward_2s": "Moved forward 2 seconds",
-    "key_prev_lyric": "Switched to previous lyric",
-    "key_next_lyric": "Switched to next lyric",
-    "key_mark_time": "Current time point marked",
-    
-    // Language selection
-    "language": "Language",
-    "lang_zh_cn": "简体中文",
-    "lang_zh_tw": "繁體中文",
-    "lang_en": "English"
+  // Bilingual lyrics
+  bilingual_enabled_title: "Bilingual Lyrics Enabled",
+  bilingual_enabled_message:
+    'Text Input: Odd lines are lyrics, even lines are translations\nLRC Import: Content after "/" will be recognized as translation',
+
+  // File Detection
+  audioFileDetected: "Detected {count} audio files, only loading the first one",
+  lyricFileDetected: "Detected {count} lyric files, only loading the first one",
+
+  // Audio file area
+  audio_file: "Audio File",
+  drop_to_upload: "Drop to Upload",
+  lyricInputTitle: "Lyric Input",
+  upload_audio: "Upload Audio File",
+
+  // Lyric input area
+  lyric_input: "Lyric Input",
+  text_input: "Text Input",
+  import_lrc: "Import LRC",
+  enable_bilingual: "Enable Bilingual Lyrics",
+  bilingual_tooltip:
+    'When enabled: Text input will use odd lines as lyrics and even lines as translations; When importing LRC, content after "/" or in double-line format will be recognized as translations.',
+  enable_recognize_time: "Allow Time Recognition",
+  recognize_time_tooltip:
+    "When enabled, timecodes and metadata in the textarea will be automatically recognized and formatted into corresponding time tags.",
+  timecodes_imported: "Imported {count} timed lyrics",
+  no_timecodes_found: "No timecodes found",
+  lyric_textarea_placeholder:
+    "Enter lyrics here, they will be automatically split by line break, commas, and periods...\nWhen bilingual lyrics are enabled: odd lines are lyrics, even lines are translations (empty lines allowed)",
+  split_lyric: "Split Lyrics",
+  upload_lrc: "Upload LRC File",
+  parsing_mode: "Parsing Mode",
+  default_mode: "Default Mode (Parse by original LRC line order)",
+  strict_mode: "Strict Mode (Import by timecode sorting)",
+
+  // Subtitle converter feature
+  convert_lrc: "Convert LRC",
+  convert_lrc_desc: "Convert SRT or VTT subtitle files to LRC format",
+  upload_subtitle: "Upload Subtitle File",
+  supported_formats: "Supported Formats",
+  srt_format: "SRT",
+  vtt_format: "VTT",
+  convert_success: "Successfully converted {count} subtitles to LRC format",
+  subtitle_text_extracted: "Extracted {count} subtitle texts",
+  subtitle_imported_with_time: "Imported {count} timed lyrics",
+  subtitle_fallback_text_only: "Module not loaded, fell back to text mode",
+  subtitle_convert_mode: "Convert Mode",
+  subtitle_text_only: "Extract Text Only",
+  subtitle_with_time: "Extract Time and Text",
+  parse_srt_error: "Cannot parse SRT file, please check the file format",
+  parse_vtt_error: "Cannot parse VTT file, please check the file format",
+  handle_subtitle_error: "Error processing subtitle file: {error}",
+  unsupported_format: "Unsupported file format, please upload SRT or VTT file",
+
+  // Timing control area
+  timing_controls: "Timing Controls",
+  process_mode: "Processing Mode",
+  line_mode: "Line-by-Line",
+  char_mode: "Character-by-Character",
+  reset: "Reset",
+  prev_lyric: "Previous",
+  next_lyric: "Next",
+  prev_lyric_text: "LEFT LRC :",
+  current_lyric_text: "CURRENT:",
+  next_lyric_text: "NEXT LRC:",
+  none: "None",
+  uninitialized_time: "[--:--.--]",
+  back_2s: "Back 2s",
+  forward_2s: "Forward 2s",
+  play_pause: "Play/Pause",
+  mark_time: "Mark Time",
+
+  // Lyric preview area
+  lyric_preview: "Lyric Preview",
+  lyric_preview_placeholder:
+    "Please enter lyrics and split them, or import an LRC file",
+  add_blank_lyric: "Add Blank Lyric",
+
+  // Time adjustment area
+  time_adjustment: "Time Adjustment",
+  adjustment_desc: "Adjust all lyric timestamps",
+  adjustment_placeholder:
+    "Enter adjustment value (seconds.milliseconds, e.g.: 0.500 or -0.200)",
+  apply_adjustment: "Apply Adjustment",
+  audio_fix_time: "Audio Data Validation Time",
+  undo_fix_time: "Undo Validation",
+  audio_sample_rate: "Sample Rate",
+  audio_duration: "Duration",
+  audio_processing_status: "Status",
+  analyzing: "Analyzing...",
+  fixing: "Fixing...",
+  completed: "Completed",
+  failed: "Failed",
+  no_undo_available: "No undo records available",
+  undo_fix_success: "Time restored to pre-validation state",
+  lyrics_fixed: "Fixed {count} lyric timestamps",
+  upload_audio_first: "Please upload an audio file first",
+  import_lyrics_first: "Please import lyrics first",
+  audio_analysis_failed: "Audio analysis failed",
+  lyrics_data_changed: "Lyrics data has changed, cannot undo",
+  result_index: "Index",
+  original_time: "Original Time",
+  fixed_time: "Fixed Time",
+  peak_position: "Peak Position",
+  peak_intensity: "Peak Intensity",
+  next_step: "Next Step: Preview Sync Effect",
+
+  // Preview interface
+  sync_preview: "Lyric Sync Preview",
+  sync_preview_placeholder:
+    "Play audio to start previewing lyric synchronization effect",
+  back_to_edit: "Previous Step: Return to Edit",
+  export_lrc: "Export LRC File",
+
+  // Metadata area
+  lyric_metadata: "Lyric Metadata",
+  meta_ar: "[ar] Artist:",
+  meta_ar_placeholder: "Artist name",
+  meta_ti: "[ti] Title:",
+  meta_ti_placeholder: "Song title",
+  meta_al: "[al] Album:",
+  meta_al_placeholder: "Album name",
+  meta_by: "[by] Creator/Editor:",
+  meta_by_placeholder: "Creator name",
+  meta_offset: "[offset] Time Offset (ms):",
+  meta_offset_placeholder: "0",
+  meta_length: "[length] Total Duration:",
+  meta_length_placeholder: "00:00.00",
+  meta_au: "[au] Singer:",
+  meta_au_placeholder: "Singer name",
+  meta_re: "[re] Arranger:",
+  meta_re_placeholder: "Arranger name",
+  meta_ve: "[ve] Version Info:",
+  meta_ve_placeholder: "Version number or description",
+  meta_composer: "[composer] Composer:",
+  meta_composer_placeholder: "Composer name",
+  meta_lyricist: "[lyricist] Lyricist:",
+  meta_lyricist_placeholder: "Lyricist name",
+  meta_translator: "[translator] Translator:",
+  meta_translator_placeholder: "Translator name",
+  meta_language: "[language] Lyric Language:",
+  meta_language_placeholder: "Language name",
+
+  // Floating buttons
+  toggle_theme: "Toggle Theme",
+  github_project: "GitHub Project",
+
+  // Message prompts
+  message_title: "Notice",
+  leave_confirm: "You are editing lyrics. Are you sure you want to leave?",
+
+  // Key operation prompts
+  key_open_file: "File selection dialog triggered",
+  key_play_pause: "Play/Pause toggled",
+  key_back_2s: "Moved back 2 seconds",
+  key_forward_2s: "Moved forward 2 seconds",
+  key_prev_lyric: "Switched to previous lyric",
+  key_next_lyric: "Switched to next lyric",
+  key_mark_time: "Current time point marked",
+  key_adjust_time_left: "Time advanced 200ms",
+  key_adjust_time_right: "Time delayed 200ms",
+  key_toggle_left_panel: "Toggle left panel display",
+  key_left_panel_expanded: "Left panel expanded",
+  key_left_panel_collapsed: "Left panel collapsed",
+
+  // Language selection
+  language: "Language",
+  lang_zh_cn: "简体中文",
+  lang_zh_tw: "繁體中文",
+  lang_en: "English",
 };
