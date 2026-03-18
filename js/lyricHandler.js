@@ -431,7 +431,7 @@ const lyricHandler = (() => {
   );
 
   // 渲染编辑界面的歌词预览
-  const renderLyricPreview = () => {
+  const renderLyricPreview = (disableScroll = false) => {
     const $preview = $("#lyric-preview");
     $preview.empty();
 
@@ -501,7 +501,7 @@ const lyricHandler = (() => {
     });
 
     // 滚动到当前选中的歌词（居中显示）
-    if (currentLyricIndex >= 0) {
+    if (!disableScroll && currentLyricIndex >= 0) {
       const $currentLine = $preview.find(".lyric-line").eq(currentLyricIndex);
       if ($currentLine.length) {
         const container = document.getElementById("lyric-preview");
@@ -1209,7 +1209,7 @@ const lyricHandler = (() => {
           lyrics[index].translation = result.translation.trim();
         }
 
-        renderLyricPreview();
+        renderLyricPreview(true);
         uiController.updateLyricContext();
       },
     });
@@ -1226,7 +1226,7 @@ const lyricHandler = (() => {
       } else if (currentLyricIndex === index - 1) {
         currentLyricIndex = index;
       }
-      renderLyricPreview();
+      renderLyricPreview(true);
       uiController.updateLyricContext();
     }
   };
@@ -1242,7 +1242,7 @@ const lyricHandler = (() => {
       } else if (currentLyricIndex === index + 1) {
         currentLyricIndex = index;
       }
-      renderLyricPreview();
+      renderLyricPreview(true);
       uiController.updateLyricContext();
     }
   };
@@ -1260,7 +1260,7 @@ const lyricHandler = (() => {
         if (currentLyricIndex >= index) {
           currentLyricIndex = Math.max(0, currentLyricIndex - 1);
         }
-        renderLyricPreview();
+        renderLyricPreview(true);
         uiController.updateLyricContext();
 
         // 显示删除成功消息
