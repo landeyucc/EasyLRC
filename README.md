@@ -15,16 +15,19 @@ EasyLRC is a web-based lyric processing tool designed to provide an intuitive an
 ## Key Features
 
 - **Modern UI**: Features a modern, neumorphic UI with a lightweight and clean design, flexible layout, and mobile device compatibility.
+- **Global Parameters Panel**: Unified control panel for processing mode and character-by-character options.
+- **Processing Mode Switch**: Supports both **line-by-line** and **character-by-character** timestamp marking. Hotkeys adapt their behavior automatically to the selected mode.
+- **Character-by-Character Enhancements**: In char mode, two auxiliary options are available — **auto-skip spaces** and **English word mode**. When word mode is enabled, a single `Space` marks the entire word at once instead of marking one letter at a time.
 - **Lyric Parsing and Editing**: Supports parsing standard and non-standard LRC syntax, allowing users to directly edit lyric content.
-- **Timestamp Editing**: Supports marking timestamps by playing audio, and also allows direct editing of timestamps.
+- **Timestamp Editing**: Supports marking timestamps by playing audio, and also allows direct editing of timestamps. Time adjustments and audio validation synchronize with character-level timestamps.
 - **Convenient Parsing**: Supports dragging files into the window for parsing, and also supports batch parsing, allowing simultaneous selection of lyrics and audio for parsing.
 - **Optimized Data Parsing**: Intelligently recognizes LRC syntax (including some non-standard syntax) and intelligently identifies file types.
 - **Multi-data Parsing**: Supports parsing bilingual lyrics (e.g., Chinese and English), and supports parsing and exporting metadata (e.g., song title, artist, album, etc., including parsing incorrectly timestamped metadata).
-- **Lyric Preview**: Built-in synchronized player supports real-time preview of lyric progress to ensure synchronization with audio.
-- **Timestamp Synchronization**: Supports adjusting overall lyric timestamps to ensure perfect synchronization between lyrics and audio.
-- **Audio Data Validation**: Supports analyzing audio data to validate and optimize lyric timestamps for better synchronization.
-- **Hotkey Control**: Supports controlling timestamp marking, audio progress, and playback events via hotkeys.
-- **Multi-language Support**: Interface and prompt messages support Chinese (Simplified), Chinese (Traditional), and English.
+- **Lyric Preview**: Built-in synchronized player supports real-time preview of lyric progress to ensure synchronization with audio. In char mode, line switching is guaranteed to wait for the **last valid character timestamp** — not the next line's row-level timestamp.
+- **Timestamp Synchronization**: Supports adjusting overall lyric timestamps to ensure perfect synchronization between lyrics and audio. Adjustments apply to **all character-level timestamps** as well.
+- **Audio Data Validation**: Supports analyzing audio data to validate and optimize lyric timestamps for better synchronization. Both validation and undo paths fully preserve character timestamps.
+- **Hotkey Control**: Supports controlling timestamp marking, audio progress, and playback events via hotkeys. Backspace (Alt+B / ArrowUp) in char mode also **removes the last marked character/word**.
+- **Multi-language Support**: Interface and prompt messages support Chinese (Simplified), Chinese (Traditional), and English. Button labels (Prev Char / Prev Word / Next Char / Next Word) update automatically with the selected mode.
 - **Theme Switching**: Supports light and dark themes, providing a personalized visual experience.
 
 ## Hotkey Support
@@ -36,11 +39,22 @@ EasyLRC is a web-based lyric processing tool designed to provide an intuitive an
 - **Play/Pause**: `ALT + Enter`
 - **Forward 2 seconds**: `N`
 - **Rewind 2 seconds**: `B`
-- **Switch to next lyric**: `ALT+N`
-- **Switch to previous lyric**: `ALT+B`
 - **Toggle left panel**: `ALT+M`
-- **Adjust current lyric time (left)**: `Left Arrow`
-- **Adjust current lyric time (right)**: `Right Arrow`
+- **Adjust current lyric time (left -200ms)**: `Left Arrow`
+- **Adjust current lyric time (right +200ms)**: `Right Arrow`
+
+### Line-by-Line Mode
+
+- **Previous Lyric Line**: `ALT + B` or `ArrowUp`
+- **Next Lyric Line**: `ALT + N` or `ArrowDown`
+
+### Character-by-Character Mode
+
+In char mode, `Alt+B / ArrowUp` also **removes the timestamp of the previous character (or word)** before backing up the cursor. When the entire line is cleared, the cursor automatically jumps to the end of the previous line to continue. The **Previous / Next** buttons in the control panel always perform row-level navigation; dedicated **Prev Char / Next Char** buttons handle character-level navigation.
+
+- **Back One Char (with undo)**: `ALT + B` or `ArrowUp`
+- **Forward One Char**: `ALT + N` or `ArrowDown`
+- **Previous / Next (row-level, no undo)**: Control panel buttons only
 
 ## Parsing Support
 
@@ -65,7 +79,7 @@ EasyLRC is a web-based lyric processing tool designed to provide an intuitive an
 [00:01.00] 这是第二行 / Is second line
 ```
 
-### Word-by-word Parsing LRC Syntax:
+### Word-by-word Parsing LRC Syntax (KaraOK Common):
 
 ```lrc
 [00:30.20]<00:30.20>这<00:30.50>是<00:30.80>第<00:31.40>一<00:31.70>行<00:32.00>
@@ -131,3 +145,4 @@ This project is open-sourced under the MIT License. Please refer to the `LICENSE
 This project initially received inspiration from the [lrc_editor](https://github.com/yiyizym/lrc_editor) project. I would like to express my gratitude to this project for providing me with the inspiration and ideas that helped me develop this project.
 
 Thanks to [@hetai9z](https://github.com/hetai9z) for their [suggestion](https://github.com/landeyucc/EasyLRC/issues/1), which helped me improve and optimize the project in version 26.3.18.
+Thanks to [@JavaCoffeePro](https://github.com/JavaCoffeePro) for their [suggestion](https://github.com/landeyucc/EasyLRC/issues/2), which helped me improve and optimize the project in version 26.9.08.

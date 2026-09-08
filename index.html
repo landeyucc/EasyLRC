@@ -32,8 +32,43 @@
                 <button id="collapse-input-panel-btn" class="collapse-panel-btn">
                     <i class="fas fa-angle-double-left"></i>
                 </button>
+                <div class="card" id="global-params">
+                    <h2 data-i18n="global_params">全局参数控制</h2>
+                    <div class="process-mode-container">
+                        <h3 data-i18n="process_mode">处理模式</h3>
+                        <div class="mode-options">
+                            <label class="mode-label">
+                                <input type="radio" name="process-mode" value="line" checked>
+                                <span data-i18n="line_mode">逐行处理</span>
+                            </label>
+                            <label class="mode-label">
+                                <input type="radio" name="process-mode" value="char">
+                                <span data-i18n="char_mode">逐字处理</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="char-options-container" id="char-options">
+                        <h3 data-i18n="char_options">逐字处理选项</h3>
+                        <div class="bilingual-switch">
+                            <label class="switch">
+                                <input type="checkbox" id="skip-space-toggle" disabled>
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="switch-label" data-i18n="skip_space">自动跳过空格</span>
+                        </div>
+                        <div class="bilingual-switch">
+                            <label class="switch">
+                                <input type="checkbox" id="word-mode-toggle" disabled>
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="switch-label" data-i18n="word_mode">英文单词处理</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
-                    <h2>音频文件</h2>
+                    <h2 data-i18n="audio_file">音频文件</h2>
                     <div class="audio-upload">
                         <label for="audio-upload" class="upload-label">
                             <i class="fas fa-music"></i>
@@ -137,25 +172,22 @@
             <section class="preview-panel">
                 <!-- 打节奏控制区域 -->
                 <div class="card" id="timing-controls">
-                    <h2>打节奏控制</h2>
-                    <div class="process-mode-container">
-                        <h3>处理模式</h3>
-                        <div class="mode-options">
-                            <label class="mode-label">
-                                <input type="radio" name="process-mode" value="line" checked>
-                                <span>逐行处理</span>
-                            </label>
-                            <label class="mode-label">
-                                <input type="radio" name="process-mode" value="char">
-                                <span>逐字处理</span>
-                            </label>
-                        </div>
-                    </div>
+                    <h2 data-i18n="timing_controls">打节奏控制</h2>
+                    <button id="mark-settings-btn" class="icon-btn" title="标记设置" aria-label="标记设置">
+                        <i class="fas fa-gear"></i>
+                    </button>
 
                     <div class="timing-navigation">
                         <button id="stop-btn" class="control-btn"><i class="fas fa-undo"></i> 重置</button>
                         <button id="prev-lyric" class="control-btn"><i class="fas fa-step-backward"></i> 上一条</button>
                         <button id="next-lyric" class="control-btn"><i class="fas fa-step-forward"></i> 下一条</button>
+                        <span class="nav-divider"></span>
+                        <button id="prev-char" class="control-btn char-only-btn hidden" data-i18n-tooltip="prev_char">
+                            <i class="fas fa-chevron-left"></i> 上一字
+                        </button>
+                        <button id="next-char" class="control-btn char-only-btn hidden" data-i18n-tooltip="next_char">
+                            下一字 <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
 
                     <!-- 自定义音频播放器 -->
@@ -259,9 +291,6 @@
                             </table>
                         </div>
                     </div>
-                    <!-- 下一步按钮 -->
-                    <button id="next-step-btn" class="action-btn accent"><i class="fas fa-arrow-right"></i>
-                        下一步：预览同步效果</button>
                 </div>
             </section>
         </main>
@@ -413,6 +442,11 @@
     <script src="js/subtitleConverter.js?v=20250130"></script>
     <script src="js/audioFixTime.js"></script>
     <script src="js/main.js?v=20250130"></script>
+
+    <!-- 浮动下一步按钮（滚动 100px 后显示，淡入淡出） -->
+    <button id="next-step-btn" class="floating-next-btn action-btn accent">
+        <i class="fas fa-arrow-right"></i><span data-i18n="next_step">下一步：预览同步效果</span>
+    </button>
 </body>
 
 </html>

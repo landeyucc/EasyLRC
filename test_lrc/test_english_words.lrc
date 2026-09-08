@@ -1,0 +1,30 @@
+[ti:Test English Song]
+[ar:Test Artist]
+[al:English Test Album]
+[by:EasyLRC Test]
+[length:03:24]
+[offset:0]
+
+[00:00.00]English LRC test file for word mode
+[00:03.50]Hello world this is a simple demo
+[00:07.20]Every single word should be recognized
+[00:11.80]When word mode is enabled properly
+
+[00:15.40]Some lines have punctuation you know
+[00:19.05]Like commas, periods, and question marks!
+[00:22.80]Even apostrophes shouldn't break anything
+[00:26.55]It's working perfectly I'm sure
+
+[00:30.30]CAPITAL letters and lowercase too
+[00:34.00]Don't mix them up with Chinese characters
+[00:37.75]This line has  three   spaces between words
+[00:41.40]And		this		one		has	tabs	instead
+
+[00:45.20]Short words: I am OK too
+[00:47.85]Medium words: coffee tiger banana
+[00:50.60]Long words: extraordinary responsibilities
+
+[00:54.30]
+[00:56.00]Empty line above should be skipped
+[00:59.50]Now the final line to end the test
+[01:03.00]Thank you for using EasyLRC tool

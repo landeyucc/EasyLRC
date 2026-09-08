@@ -1,47 +1,32 @@
-/**
- * 语言控制模块：负责多语言切换和本地化功能
- */
 const languageController = (() => {
-  // 默认语言
   let currentLanguage = "zh-CN";
-  // 可用语言列表
   const availableLanguages = ["zh-CN", "zh-TW", "en-US"];
-  // 语言数据
   let languageData = {};
 
-  // 初始化语言控制器
   const init = () => {
-    // 从本地存储中获取用户之前选择的语言
     const savedLanguage = localStorage.getItem("easyLRC_language");
     if (savedLanguage && availableLanguages.includes(savedLanguage)) {
       currentLanguage = savedLanguage;
     } else {
-      // 如果没有保存的语言，尝试使用浏览器语言
       const browserLang = navigator.language || navigator.userLanguage;
       if (browserLang.startsWith("zh")) {
-        // 检测是否为繁体中文地区
         if (browserLang === "zh-TW" || browserLang === "zh-HK") {
           currentLanguage = "zh-TW";
         } else {
           currentLanguage = "zh-CN";
         }
       } else {
-        // 默认使用英文
         currentLanguage = "en-US";
       }
-      // 保存到本地存储
       localStorage.setItem("easyLRC_language", currentLanguage);
     }
 
-    // 加载语言文件
     loadLanguageFile(currentLanguage)
       .then(() => {
-        // 添加语言切换按钮到浮动按钮区域
         addLanguageSwitcher();
       })
       .catch((err) => {
         console.error("初始化语言失败:", err);
-        // 如果加载失败且不是默认语言，尝试加载默认语言
         if (currentLanguage !== "zh-CN") {
           console.log("尝试加载默认语言 (zh-CN)");
           return loadLanguageFile("zh-CN").then(() => {
@@ -51,10 +36,8 @@ const languageController = (() => {
       });
   };
 
-  // 加载语言文件
   const loadLanguageFile = (lang) => {
     return new Promise((resolve, reject) => {
-      // 如果已经加载过该语言，直接使用
       if (languageData[lang]) {
         applyLanguage(lang);
         resolve();
@@ -62,20 +45,17 @@ const languageController = (() => {
       }
 
       try {
-        // 创建script元素加载语言文件
         const script = document.createElement("script");
         script.src = `lang/${lang}.js`;
 
-        // 设置超时处理
         const timeout = setTimeout(() => {
           console.error(`加载语言文件超时: ${lang}`);
           reject(new Error(`加载语言文件超时: ${lang}`));
-        }, 5000); // 5秒超时
+        }, 5000); 
 
         script.onload = () => {
           clearTimeout(timeout);
           try {
-            // 根据语言代码获取对应的变量
             let langVar;
             switch (lang) {
               case "zh-CN":
@@ -95,10 +75,8 @@ const languageController = (() => {
               throw new Error(`语言文件 ${lang} 加载成功但变量不可用`);
             }
 
-            // 保存语言数据
             languageData[lang] = langVar;
 
-            // 应用语言
             applyLanguage(lang);
             resolve();
           } catch (err) {
@@ -121,16 +99,13 @@ const languageController = (() => {
     });
   };
 
-  // 应用语言到界面
   const applyLanguage = (lang) => {
-    // 更新html lang属性
     document.documentElement.lang = lang;
 
     currentLanguage = lang;
     const data = languageData[lang];
     if (!data) return;
 
-    // 首先保存解析模式相关的文本，以便后续使用
     const parsingModeData = {
       parsing_mode: data.parsing_mode,
       default_mode: data.default_mode,
@@ -139,22 +114,18 @@ const languageController = (() => {
 
     console.log("应用语言:", lang, "解析模式数据:", parsingModeData);
 
-    // 更新歌词上下文显示区域的标签文本
     $("#prev-lyric-label").text(getText("prev_lyric_text"));
     $("#current-lyric-label").text(getText("current_lyric_text"));
     $("#next-lyric-label").text(getText("next_lyric_text"));
 
-    // 更新歌词上下文显示区域的歌词文本
     uiController.updateLyricContext();
 
-    // 更新页面标题
     document.title = data.title;
     const headerH1 = document.querySelector("header h1");
     if (headerH1) headerH1.textContent = data.title;
     const headerP = document.querySelector("header p");
     if (headerP) headerP.textContent = data.subtitle;
 
-    // 更新音频文件区域
     const audioFileH2 = document.querySelector(
       ".input-panel .card h2:first-of-type",
     );
@@ -163,7 +134,6 @@ const languageController = (() => {
     const uploadLabel = document.querySelector(".upload-label span");
     if (uploadLabel) uploadLabel.textContent = data.upload_audio;
 
-    // 更新歌词输入区域
     const lyricInputH2 = document.querySelector(
       ".input-panel .card:nth-of-type(2) h2",
     );
@@ -203,10 +173,8 @@ const languageController = (() => {
     );
     if (uploadLrcLabel) uploadLrcLabel.textContent = data.upload_lrc;
 
-    // 更新解析模式区域
     updateParsingModeText(parsingModeData);
 
-    // 更新打节奏控制区域
     const timingControlsH2 = document.querySelector("#timing-controls h2");
     if (timingControlsH2) timingControlsH2.textContent = data.timing_controls;
 
@@ -223,31 +191,15 @@ const languageController = (() => {
     if (stopBtn)
       stopBtn.innerHTML = `<i class="fas fa-undo"></i> ${data.reset}`;
 
-    const prevLyricBtn = document.querySelector("#prev-lyric");
-    if (prevLyricBtn)
-      prevLyricBtn.innerHTML = `<i class="fas fa-step-backward"></i> ${data.prev_lyric}`;
+    let currentProcessMode = "line";
+    if (
+      typeof lyricHandler !== "undefined" &&
+      typeof lyricHandler.getProcessMode === "function"
+    ) {
+      currentProcessMode = lyricHandler.getProcessMode();
+    }
+    updateProcessModeLabels(currentProcessMode);
 
-    const nextLyricBtn = document.querySelector("#next-lyric");
-    if (nextLyricBtn)
-      nextLyricBtn.innerHTML = `<i class="fas fa-step-forward"></i> ${data.next_lyric}`;
-
-    const prevLyricSpan = document.querySelector(
-      ".previous-lyric span:first-child",
-    );
-    if (prevLyricSpan) prevLyricSpan.textContent = data.prev_lyric_text;
-
-    const currentLyricSpan = document.querySelector(
-      ".current-lyric span:first-child",
-    );
-    if (currentLyricSpan)
-      currentLyricSpan.textContent = data.current_lyric_text;
-
-    const nextLyricSpan = document.querySelector(
-      ".next-lyric span:first-child",
-    );
-    if (nextLyricSpan) nextLyricSpan.textContent = data.next_lyric_text;
-
-    // 更新无歌词文本
     const noneTexts = document.querySelectorAll(
       "#previous-lyric-text, #current-lyric-text, #next-lyric-text",
     );
@@ -279,7 +231,6 @@ const languageController = (() => {
     if (setTimeBtn)
       setTimeBtn.innerHTML = `<i class="fas fa-marker"></i> ${data.mark_time}`;
 
-    // 更新歌词预览区域
     const lyricPreviewH2 = document.querySelector(".lyric-preview-header h2");
     if (lyricPreviewH2) lyricPreviewH2.textContent = data.lyric_preview;
 
@@ -294,7 +245,6 @@ const languageController = (() => {
     if (addBlankBtn)
       addBlankBtn.innerHTML = `<i class="fas fa-plus-circle"></i> ${data.add_blank_lyric}`;
 
-    // 更新时间调整区域
     const adjustmentPanelH2 = document.querySelector("#adjustment-panel h2");
     if (adjustmentPanelH2) adjustmentPanelH2.textContent = data.time_adjustment;
 
@@ -311,7 +261,6 @@ const languageController = (() => {
     if (nextStepBtn)
       nextStepBtn.innerHTML = `<i class="fas fa-arrow-right"></i> ${data.next_step}`;
 
-    // 更新预览界面
     const previewInterfaceH2 = document.querySelector(
       "#preview-interface .card h2",
     );
@@ -344,12 +293,10 @@ const languageController = (() => {
     if (exportLrc)
       exportLrc.innerHTML = `<i class="fas fa-download"></i> ${data.export_lrc}`;
 
-    // 更新元数据区域
     const toggleMetadataBtn = document.querySelector("#toggle-metadata-btn");
     if (toggleMetadataBtn)
       toggleMetadataBtn.innerHTML = `<i class="fas fa-chevron-down"></i> ${data.lyric_metadata}`;
 
-    // 使用函数更新元数据字段，避免重复代码
     const updateMetaField = (fieldId, labelText, placeholderText) => {
       const label = document.querySelector(`label[for="${fieldId}"]`);
       if (label) label.textContent = labelText;
@@ -358,7 +305,6 @@ const languageController = (() => {
       if (input) input.placeholder = placeholderText;
     };
 
-    // 更新所有元数据字段
     updateMetaField("meta-ar", data.meta_ar, data.meta_ar_placeholder);
     updateMetaField("meta-ti", data.meta_ti, data.meta_ti_placeholder);
     updateMetaField("meta-al", data.meta_al, data.meta_al_placeholder);
@@ -397,14 +343,12 @@ const languageController = (() => {
       data.meta_language_placeholder,
     );
 
-    // 更新浮动按钮
     const themeToggle = document.querySelector("#theme-toggle");
     if (themeToggle) themeToggle.title = data.toggle_theme;
 
     const githubLink = document.querySelector(".github-link");
     if (githubLink) githubLink.title = data.github_project;
 
-    // 更新字幕转换区域
     const subtitleConvertBtn = document.querySelector("#subtitle-convert-btn");
     if (subtitleConvertBtn) subtitleConvertBtn.textContent = data.convert_lrc;
 
@@ -429,7 +373,6 @@ const languageController = (() => {
         subtitleModeLabels[1].textContent = data.subtitle_with_time;
     }
 
-    // 更新离开确认消息
     window.onbeforeunload = (e) => {
       const textarea = document.getElementById("lyric-textarea");
       const hasTextareaContent = textarea && textarea.value.trim().length > 0;
@@ -451,7 +394,6 @@ const languageController = (() => {
       }
     };
 
-    // 更新所有带有 data-i18n 属性的元素
     const i18nElements = document.querySelectorAll("[data-i18n]");
     i18nElements.forEach((element) => {
       const key = element.dataset.i18n;
@@ -460,14 +402,11 @@ const languageController = (() => {
       }
     });
 
-    // 保存当前语言到本地存储
     localStorage.setItem("easyLRC_language", lang);
 
-    // 更新音频数据校验状态文本
     const audioFixStatus = document.getElementById("audio-fix-status");
     if (audioFixStatus && audioFixStatus.textContent) {
       const currentText = audioFixStatus.textContent.trim();
-      // 根据当前文本更新为对应语言的文本
       if (currentText === "分析中..." || currentText === "Analyzing...") {
         audioFixStatus.textContent = data.analyzing || "分析中...";
       } else if (currentText === "校正中..." || currentText === "Fixing...") {
@@ -478,39 +417,32 @@ const languageController = (() => {
     }
   };
 
-  // 添加语言切换按钮
   const addLanguageSwitcher = () => {
-    // 检查浮动按钮区域是否存在
     const floatingButtons = document.querySelector(".floating-buttons");
     if (!floatingButtons) {
       console.error("找不到浮动按钮区域 (.floating-buttons)");
       return;
     }
 
-    // 检查是否已经存在语言切换按钮
     if (document.querySelector("#language-toggle")) {
-      return; // 避免重复添加
+      return; 
     }
 
-    // 创建语言切换按钮
     const langButton = document.createElement("button");
     langButton.id = "language-toggle";
     langButton.className = "floating-button language-toggle";
     langButton.title = languageData[currentLanguage]?.language || "语言";
     langButton.innerHTML = '<i class="fas fa-language"></i>';
 
-    // 创建语言下拉菜单
     const langMenu = document.createElement("div");
     langMenu.className = "language-menu";
     langMenu.style.display = "none";
 
-    // 添加语言选项
     availableLanguages.forEach((lang) => {
       const langOption = document.createElement("div");
       langOption.className = "language-option";
       langOption.dataset.lang = lang;
 
-      // 设置语言选项文本
       switch (lang) {
         case "zh-CN":
           langOption.textContent = "简体中文";
@@ -523,19 +455,16 @@ const languageController = (() => {
           break;
       }
 
-      // 高亮当前选中的语言
       if (lang === currentLanguage) {
         langOption.classList.add("active");
       }
 
-      // 添加点击事件
       langOption.addEventListener("click", (e) => {
         e.stopPropagation();
         const selectedLang = e.target.dataset.lang;
         if (selectedLang !== currentLanguage) {
           loadLanguageFile(selectedLang)
             .then(() => {
-              // 更新所有语言选项的激活状态
               const options = document.querySelectorAll(".language-option");
               if (options) {
                 options.forEach((option) => {
@@ -556,27 +485,22 @@ const languageController = (() => {
       langMenu.appendChild(langOption);
     });
 
-    // 点击语言按钮显示/隐藏下拉菜单
     langButton.addEventListener("click", (e) => {
       e.stopPropagation();
       langMenu.style.display =
         langMenu.style.display === "none" ? "block" : "none";
     });
 
-    // 点击页面其他地方隐藏下拉菜单
     document.addEventListener("click", () => {
       langMenu.style.display = "none";
     });
 
-    // 将按钮和菜单添加到浮动按钮区域
     floatingButtons.appendChild(langButton);
     floatingButtons.appendChild(langMenu);
 
-    // 添加CSS样式
     addLanguageSwitcherStyles();
   };
 
-  // 添加语言切换器的CSS样式
   const addLanguageSwitcherStyles = () => {
     const style = document.createElement("style");
     style.textContent = `
@@ -615,17 +539,14 @@ const languageController = (() => {
     document.head.appendChild(style);
   };
 
-  // 获取当前语言
   const getCurrentLanguage = () => {
     return currentLanguage;
   };
 
-  // 获取翻译文本
   const getText = (key) => {
     return languageData[currentLanguage]?.[key] || key;
   };
 
-  // 专门的函数用于更新解析模式区域的文本，确保与其他功能区完全分离
   const updateParsingModeText = (data) => {
     if (!data) return;
 
@@ -651,7 +572,6 @@ const languageController = (() => {
     }
   };
 
-  // 在DOM完全加载后再次应用解析模式的翻译
   document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       const data = languageData[currentLanguage];
@@ -666,7 +586,6 @@ const languageController = (() => {
     }, 100);
   });
 
-  // 添加全局方法，允许手动更新解析模式文本，用于调试
   window.updateParsingMode = function () {
     const data = languageData[currentLanguage];
     if (data) {
@@ -679,16 +598,67 @@ const languageController = (() => {
     }
   };
 
-  // 公开API
+  const updateProcessModeLabels = (mode) => {
+    const data = languageData[currentLanguage];
+    if (!data) return;
+
+    const isChar = mode === "char";
+    let isWordMode = false;
+    if (
+      typeof lyricHandler !== "undefined" &&
+      typeof lyricHandler.getWordMode === "function"
+    ) {
+      isWordMode = lyricHandler.getWordMode();
+    }
+
+    const prevLyricBtn = document.querySelector("#prev-lyric");
+    if (prevLyricBtn) {
+      prevLyricBtn.innerHTML = `<i class="fas fa-step-backward"></i> ${data.prev_lyric}`;
+    }
+
+    const nextLyricBtn = document.querySelector("#next-lyric");
+    if (nextLyricBtn) {
+      nextLyricBtn.innerHTML = `<i class="fas fa-step-forward"></i> ${data.next_lyric}`;
+    }
+
+    const prevCharBtn = document.querySelector("#prev-char");
+    const prevCharLabel = isWordMode
+      ? data.prev_word || data.prev_char || "Prev"
+      : data.prev_char || "Prev";
+    if (prevCharBtn) {
+      prevCharBtn.innerHTML = `<i class="fas fa-chevron-left"></i> ${prevCharLabel}`;
+    }
+    const nextCharBtn = document.querySelector("#next-char");
+    const nextCharLabel = isWordMode
+      ? data.next_word || data.next_char || "Next"
+      : data.next_char || "Next";
+    if (nextCharBtn) {
+      nextCharBtn.innerHTML = `${nextCharLabel} <i class="fas fa-chevron-right"></i>`;
+    }
+
+    const prevSpan = document.querySelector(".previous-lyric span:first-child");
+    const currentSpan = document.querySelector(".current-lyric span:first-child");
+    const nextSpan = document.querySelector(".next-lyric span:first-child");
+
+    if (prevSpan) prevSpan.textContent = data.prev_lyric_text;
+    if (nextSpan) nextSpan.textContent = data.next_lyric_text;
+
+    if (currentSpan) {
+      currentSpan.textContent = isChar
+        ? data.current_lyric_text_char || data.current_lyric_text
+        : data.current_lyric_text;
+    }
+  };
+
   return {
     init,
     getCurrentLanguage,
     getText,
     applyLanguage,
+    updateProcessModeLabels,
   };
 })();
 
-// 确保DOM完全加载后手动更新解析模式文本
 window.addEventListener("load", function () {
   setTimeout(() => {
     if (

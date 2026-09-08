@@ -1,17 +1,10 @@
-/**
- * 主入口模块：初始化所有模块，协调各模块工作
- */
 $(document).ready(() => {
-  // 初始化语言控制器
   languageController.init();
 
-  // 初始化UI
   uiController.init();
 
-  // 初始化歌词预览
   lyricHandler.renderLyricPreview();
 
-  // 初始化时禁用播放按钮（没有音频时）
   if (
     typeof audioHandler !== "undefined" &&
     audioHandler.updatePlayButtonsState
@@ -19,17 +12,77 @@ $(document).ready(() => {
     audioHandler.updatePlayButtonsState(false);
   }
 
-  // 跟踪当前界面状态（编辑界面或预览界面）
   window.isPreviewMode = false;
 
-  // 处理模式切换事件
+  // 浮动下一步按钮
+  (() => {
+    const btn = document.getElementById("next-step-btn");
+    if (!btn) return;
+
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                  || window.innerWidth < 768;
+
+    // —— 移动端滚动阈值（px） ——
+    const MOBILE_THRESHOLD = 1000;
+    // —— PC端滚动阈值（px） ——
+    const DESKTOP_THRESHOLD = 280;
+
+    const THRESHOLD = isMobile ? MOBILE_THRESHOLD : DESKTOP_THRESHOLD;
+    let ticking = false;
+
+    const update = () => {
+      const scrolled = window.scrollY || document.documentElement.scrollTop || 0;
+      btn.classList.toggle("is-visible", scrolled >= THRESHOLD);
+      ticking = false;
+    };
+
+    // 暴露给 lyricHandler 在切回编辑界面时调用
+    window.__updateNextStepBtnVisibility = update;
+
+    window.addEventListener("scroll", () => {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    update();
+  })();
+
+  // 浮动下一步按钮点击 → 切换预览界面
+  const nextStepBtn = document.getElementById("next-step-btn");
+  if (nextStepBtn && typeof lyricHandler !== "undefined" && typeof lyricHandler.switchToPreviewInterface === "function") {
+    nextStepBtn.addEventListener("click", () => {
+      lyricHandler.switchToPreviewInterface();
+    });
+  }
+
+
   document
     .querySelector('input[name="process-mode"][value="line"]')
     .addEventListener("change", function () {
       if (this.checked) {
         lyricHandler.setProcessMode("line");
-        // 启用双语歌词开关
         document.getElementById("bilingual-toggle").disabled = false;
+        const skipSpaceToggle = document.getElementById("skip-space-toggle");
+        const wordModeToggle = document.getElementById("word-mode-toggle");
+        if (skipSpaceToggle) {
+          skipSpaceToggle.disabled = true;
+          skipSpaceToggle.checked = false;
+        }
+        if (wordModeToggle) {
+          wordModeToggle.disabled = true;
+          wordModeToggle.checked = false;
+        }
+        document.querySelectorAll(".char-only-btn").forEach((el) => {
+          el.classList.add("hidden");
+        });
+        document.querySelectorAll(".nav-divider").forEach((el) => {
+          el.classList.add("hidden");
+        });
+        if (typeof languageController.updateProcessModeLabels === "function") {
+          languageController.updateProcessModeLabels("line");
+        }
       }
     });
 
@@ -38,18 +91,93 @@ $(document).ready(() => {
     .addEventListener("change", function () {
       if (this.checked) {
         lyricHandler.setProcessMode("char");
-        // 禁用双语歌词
         document.getElementById("bilingual-toggle").checked = false;
         document.getElementById("bilingual-toggle").disabled = true;
+        const skipSpaceToggle = document.getElementById("skip-space-toggle");
+        const wordModeToggle = document.getElementById("word-mode-toggle");
+        if (skipSpaceToggle) {
+          skipSpaceToggle.disabled = false;
+          skipSpaceToggle.checked = true;
+        }
+        if (wordModeToggle) wordModeToggle.disabled = false;
+        document.querySelectorAll(".char-only-btn").forEach((el) => {
+          el.classList.remove("hidden");
+        });
+        document.querySelectorAll(".nav-divider").forEach((el) => {
+          el.classList.remove("hidden");
+        });
+        if (typeof languageController.updateProcessModeLabels === "function") {
+          languageController.updateProcessModeLabels("char");
+        }
       }
     });
 
-  // 绑定全局快捷键
+  const prevCharBtn = document.getElementById("prev-char");
+  if (prevCharBtn) {
+    prevCharBtn.addEventListener("click", () => {
+      lyricHandler.navigateLyric(-1);
+    });
+  }
+  const nextCharBtn = document.getElementById("next-char");
+  if (nextCharBtn) {
+    nextCharBtn.addEventListener("click", () => {
+      lyricHandler.navigateLyric(1);
+    });
+  }
+
+  // 自动跳过空格 开关
+  const skipSpaceToggle = document.getElementById("skip-space-toggle");
+  if (skipSpaceToggle) {
+    skipSpaceToggle.addEventListener("change", function () {
+      if (lyricHandler.getWordMode()) {
+        // wordMode 锁定 skipSpace：强制覆盖内部状态 + UI，避免用户误点击造成不一致
+        lyricHandler.setAutoSkipSpace(true);
+        this.checked = true;
+        this.disabled = true;
+      } else {
+        lyricHandler.setAutoSkipSpace(this.checked);
+      }
+    });
+  }
+
+  const wordModeToggle = document.getElementById("word-mode-toggle");
+  if (wordModeToggle) {
+    wordModeToggle.addEventListener("change", function () {
+      lyricHandler.setWordMode(this.checked);
+      if (this.checked) {
+        if (skipSpaceToggle) {
+          skipSpaceToggle.checked = true;
+          skipSpaceToggle.disabled = true;
+        }
+      } else {
+        if (skipSpaceToggle) {
+          skipSpaceToggle.disabled = false;
+          skipSpaceToggle.checked = lyricHandler.getAutoSkipSpace();
+        }
+      }
+      if (typeof languageController.updateProcessModeLabels === "function") {
+        languageController.updateProcessModeLabels("char");
+      }
+    });
+  }
+
+  const markSettingsBtn = document.getElementById("mark-settings-btn");
+  if (markSettingsBtn) {
+    markSettingsBtn.addEventListener("click", function () {
+      if (typeof uiController !== "undefined" && typeof uiController.showMarkSettings === "function") {
+        uiController.showMarkSettings();
+      }
+    });
+  }
+
   $(document).on("keydown", function (e) {
-    // 忽略在输入框中的按键事件
     if ($(e.target).is("input, textarea")) return;
 
-    // 检查是否有音频和歌词
+    const isCharMode =
+      typeof lyricHandler !== "undefined" &&
+      typeof lyricHandler.getProcessMode === "function" &&
+      lyricHandler.getProcessMode() === "char";
+
     const hasAudio =
       typeof audioHandler !== "undefined" &&
       audioHandler.getAudioElement &&
@@ -59,31 +187,25 @@ $(document).ready(() => {
         ? lyricHandler.getLyrics().length > 0
         : false;
 
-    // 根据当前界面状态决定是否执行快捷键操作
 
-    // Alt+O：打开文件选择（仅在编辑界面生效）
     if (!window.isPreviewMode && e.altKey && e.key === "o") {
       e.preventDefault();
-      // 创建一个临时的文件输入元素
       const fileInput = document.createElement("input");
       fileInput.type = "file";
       fileInput.accept = "audio/*,.lrc,.txt,.srt,.vtt";
       fileInput.style.display = "none";
       document.body.appendChild(fileInput);
 
-      // 显示按键操作提示
       uiController.showMessage({
         message: languageController.getText("key_open_file"),
         type: "info",
         duration: 2000,
       });
 
-      // 监听文件选择事件
       fileInput.addEventListener("change", function () {
         if (this.files && this.files.length > 0) {
           const file = this.files[0];
           const fileName = file.name.toLowerCase();
-          // 根据文件类型处理
           if (file.type.startsWith("audio/")) {
             audioHandler.handleAudioFile(file);
           } else if (fileName.endsWith(".lrc") || fileName.endsWith(".txt")) {
@@ -92,20 +214,16 @@ $(document).ready(() => {
             subtitleConverter.handleSubtitleFile(file);
           }
         }
-        // 移除临时元素
         document.body.removeChild(fileInput);
       });
 
-      // 触发点击事件
       fileInput.click();
     }
 
-    // Alt+Enter：播放/暂停音频（需要音频）
     if (hasAudio && e.altKey && e.key === "Enter") {
       e.preventDefault();
       audioHandler.togglePlay();
 
-      // 显示按键操作提示
       uiController.showMessage({
         message: languageController.getText("key_play_pause"),
         type: "info",
@@ -113,12 +231,10 @@ $(document).ready(() => {
       });
     }
 
-    // B键：后退两秒（需要音频）
     if (hasAudio && ((!e.altKey && e.key === "b") || e.key === "B")) {
       e.preventDefault();
       audioHandler.seekRelative(-2);
 
-      // 显示按键操作提示
       uiController.showMessage({
         message: languageController.getText("key_back_2s"),
         type: "info",
@@ -126,12 +242,10 @@ $(document).ready(() => {
       });
     }
 
-    // N键：前进两秒（需要音频）
     if (hasAudio && ((!e.altKey && e.key === "n") || e.key === "N")) {
       e.preventDefault();
       audioHandler.seekRelative(2);
 
-      // 显示按键操作提示
       uiController.showMessage({
         message: languageController.getText("key_forward_2s"),
         type: "info",
@@ -139,7 +253,6 @@ $(document).ready(() => {
       });
     }
 
-    // Alt+B：切换上一个歌词（仅在编辑界面生效，需要歌词）
     if (
       !window.isPreviewMode &&
       hasLyrics &&
@@ -149,15 +262,15 @@ $(document).ready(() => {
       e.preventDefault();
       lyricHandler.navigateLyric(-1);
 
-      // 显示按键操作提示
       uiController.showMessage({
-        message: languageController.getText("key_prev_lyric"),
+        message: languageController.getText(
+          isCharMode ? "key_prev_char" : "key_prev_lyric",
+        ),
         type: "info",
         duration: 2000,
       });
     }
 
-    // Alt+N：切换下一个歌词（仅在编辑界面生效，需要歌词）
     if (
       !window.isPreviewMode &&
       hasLyrics &&
@@ -167,20 +280,19 @@ $(document).ready(() => {
       e.preventDefault();
       lyricHandler.navigateLyric(1);
 
-      // 显示按键操作提示
       uiController.showMessage({
-        message: languageController.getText("key_next_lyric"),
+        message: languageController.getText(
+          isCharMode ? "key_next_char" : "key_next_lyric",
+        ),
         type: "info",
         duration: 2000,
       });
     }
 
-    // 空格键：标记时间（仅在编辑界面生效，需要歌词）
     if (!window.isPreviewMode && hasLyrics && e.key === " ") {
       e.preventDefault();
       lyricHandler.markCurrentLyricTime();
 
-      // 显示按键操作提示
       uiController.showMessage({
         message: languageController.getText("key_mark_time"),
         type: "info",
@@ -188,75 +300,109 @@ $(document).ready(() => {
       });
     }
 
-    // 上方向键：切换上一句歌词（需要歌词）
+    const swapArrow =
+      typeof lyricHandler !== "undefined" &&
+      typeof lyricHandler.getMarkSettings === "function" &&
+      lyricHandler.getMarkSettings().swapArrowKeys;
+
     if (hasLyrics && e.key === "ArrowUp") {
       e.preventDefault();
       if (window.isPreviewMode) {
-        // 预览界面：切换同步预览歌词
         lyricHandler.navigateSyncLyric(-1);
         uiController.showMessage({
           message: languageController.getText("key_prev_lyric"),
           type: "info",
           duration: 2000,
         });
+      } else if (swapArrow) {
+        lyricHandler.adjustCurrentLyricTime(-0.2);
+        uiController.showMessage({
+          message: languageController.getText("key_adjust_time_left"),
+          type: "info",
+          duration: 1500,
+        });
       } else {
-        // 编辑界面：切换歌词预览
         lyricHandler.navigateLyric(-1);
         uiController.showMessage({
-          message: languageController.getText("key_prev_lyric"),
+          message: languageController.getText(
+            isCharMode ? "key_prev_char" : "key_prev_lyric",
+          ),
           type: "info",
           duration: 2000,
         });
       }
     }
 
-    // 下方向键：切换下一句歌词（需要歌词）
     if (hasLyrics && e.key === "ArrowDown") {
       e.preventDefault();
       if (window.isPreviewMode) {
-        // 预览界面：切换同步预览歌词
         lyricHandler.navigateSyncLyric(1);
         uiController.showMessage({
           message: languageController.getText("key_next_lyric"),
           type: "info",
           duration: 2000,
         });
+      } else if (swapArrow) {
+        lyricHandler.adjustCurrentLyricTime(0.2);
+        uiController.showMessage({
+          message: languageController.getText("key_adjust_time_right"),
+          type: "info",
+          duration: 1500,
+        });
       } else {
-        // 编辑界面：切换歌词预览
         lyricHandler.navigateLyric(1);
         uiController.showMessage({
-          message: languageController.getText("key_next_lyric"),
+          message: languageController.getText(
+            isCharMode ? "key_next_char" : "key_next_lyric",
+          ),
           type: "info",
           duration: 2000,
         });
       }
     }
 
-    // 左方向键：精细调整当前歌词时间（仅编辑界面，需要歌词）
     if (!window.isPreviewMode && hasLyrics && e.key === "ArrowLeft") {
       e.preventDefault();
-      // 每次调整 -0.2秒（200毫秒）
-      lyricHandler.adjustCurrentLyricTime(-0.2);
-      uiController.showMessage({
-        message: languageController.getText("key_adjust_time_left"),
-        type: "info",
-        duration: 1500,
-      });
+      if (swapArrow) {
+        lyricHandler.navigateLyric(-1);
+        uiController.showMessage({
+          message: languageController.getText(
+            isCharMode ? "key_prev_char" : "key_prev_lyric",
+          ),
+          type: "info",
+          duration: 2000,
+        });
+      } else {
+        lyricHandler.adjustCurrentLyricTime(-0.2);
+        uiController.showMessage({
+          message: languageController.getText("key_adjust_time_left"),
+          type: "info",
+          duration: 1500,
+        });
+      }
     }
 
-    // 右方向键：精细调整当前歌词时间（仅编辑界面，需要歌词）
     if (!window.isPreviewMode && hasLyrics && e.key === "ArrowRight") {
       e.preventDefault();
-      // 每次调整 +0.2秒（200毫秒）
-      lyricHandler.adjustCurrentLyricTime(0.2);
-      uiController.showMessage({
-        message: languageController.getText("key_adjust_time_right"),
-        type: "info",
-        duration: 1500,
-      });
+      if (swapArrow) {
+        lyricHandler.navigateLyric(1);
+        uiController.showMessage({
+          message: languageController.getText(
+            isCharMode ? "key_next_char" : "key_next_lyric",
+          ),
+          type: "info",
+          duration: 2000,
+        });
+      } else {
+        lyricHandler.adjustCurrentLyricTime(0.2);
+        uiController.showMessage({
+          message: languageController.getText("key_adjust_time_right"),
+          type: "info",
+          duration: 1500,
+        });
+      }
     }
 
-    // Alt+M：切换左侧面板显示/隐藏
     if (e.altKey && (e.key === "m" || e.key === "M")) {
       e.preventDefault();
       const isMobile = window.innerWidth <= 768;
@@ -266,13 +412,11 @@ $(document).ready(() => {
         if (inputPanel && expandBtn) {
           const isCollapsed = inputPanel.classList.contains("collapsed");
           if (isCollapsed) {
-            // 展开左侧面板
             inputPanel.classList.remove("collapsed");
             expandBtn.classList.add("hidden");
             document
               .querySelector("main")
               .classList.remove("input-panel-collapsed");
-            // 显示按键操作提示
             uiController.showMessage({
               message:
                 languageController.getText("key_left_panel_expanded") ||
@@ -281,13 +425,11 @@ $(document).ready(() => {
               duration: 2000,
             });
           } else {
-            // 折叠左侧面板
             inputPanel.classList.add("collapsed");
             expandBtn.classList.remove("hidden");
             document
               .querySelector("main")
               .classList.add("input-panel-collapsed");
-            // 显示按键操作提示
             uiController.showMessage({
               message:
                 languageController.getText("key_left_panel_collapsed") ||
@@ -301,17 +443,14 @@ $(document).ready(() => {
     }
   });
 
-  // 绑定字幕上传事件
   $("#subtitle-upload").on("change", function (e) {
     const file = e.target.files[0];
     if (file) {
       subtitleConverter.handleSubtitleFile(file);
-      // 清空input以便重复选择同一文件
       $(this).val("");
     }
   });
 
-  // 处理textarea手动调整高度
   const textarea = document.getElementById("lyric-textarea");
   if (textarea) {
     let isManuallyResizing = false;
@@ -353,7 +492,6 @@ $(document).ready(() => {
     }
   });
 
-  // 绑定全局事件
   $(window).on("beforeunload", (e) => {
     const textarea = document.getElementById("lyric-textarea");
     const hasTextareaContent = textarea && textarea.value.trim().length > 0;
@@ -371,7 +509,6 @@ $(document).ready(() => {
     }
   });
 
-  // 现代化提示框功能
   function setupTooltips() {
     document.querySelectorAll(".tooltip-icon").forEach((icon) => {
       let tooltipEl = null;
@@ -380,7 +517,6 @@ $(document).ready(() => {
         const tooltipKey = this.dataset.tooltip;
         if (!tooltipKey) return;
 
-        // 获取翻译文本或后备文本
         let text = null;
         try {
           text =
@@ -395,13 +531,11 @@ $(document).ready(() => {
 
         if (!text) return;
 
-        // 创建提示框元素
         tooltipEl = document.createElement("div");
         tooltipEl.className = "custom-tooltip";
         tooltipEl.textContent = text;
         document.body.appendChild(tooltipEl);
 
-        // 定位提示框
         const rect = this.getBoundingClientRect();
         const tooltipRect = tooltipEl.getBoundingClientRect();
 
@@ -410,7 +544,6 @@ $(document).ready(() => {
           rect.left + rect.width / 2 - tooltipRect.width / 2 + "px";
         tooltipEl.style.top = rect.top - tooltipRect.height - 8 + "px";
 
-        // 延迟显示动画
         requestAnimationFrame(() => {
           tooltipEl.classList.add("show");
         });
@@ -430,7 +563,6 @@ $(document).ready(() => {
     });
   }
 
-  // 延迟初始化提示框，确保语言已加载
   setTimeout(setupTooltips, 300);
 
   const isMobile = window.innerWidth <= 768;

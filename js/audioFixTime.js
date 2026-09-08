@@ -1,6 +1,3 @@
-/**
- * 音频分析模块：负责音频PCM等功能
- */
 const audioFixTime = (() => {
   const analyzeAudio = (file) => {
     return new Promise((resolve, reject) => {
