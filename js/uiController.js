@@ -250,7 +250,7 @@ const uiController = (() => {
         if (typeof lyricHandler !== "undefined" && typeof lyricHandler.getMarkSettings === "function") {
             current = lyricHandler.getMarkSettings();
         } else {
-            current = { bindTimeOnBack: false, bufferTime: 0, swapArrowKeys: false, backDelay: 200 };
+            current = { bindTimeOnBack: false, bufferTime: 0, swapArrowKeys: false, backDelay: 200, audioVolume: 0.8 };
         }
 
         $('.mark-settings-dialog').remove();
@@ -275,6 +275,13 @@ const uiController = (() => {
                         <label class="mark-setting-label" data-i18n="back_delay_ms">回退按钮延迟（毫秒）</label>
                         <input type="number" id="back-delay-input" min="0" max="5000" step="50" value="${current.backDelay}">
                     </div>
+                    <div class="mark-setting-row">
+                        <label class="mark-setting-label" data-i18n="audio_volume">音频音量</label>
+                        <div class="volume-slider-wrap">
+                            <input type="range" id="volume-slider" min="0" max="100" step="1" value="${Math.round((current.audioVolume ?? 0.8) * 100)}">
+                            <span class="volume-value" id="volume-value">${Math.round((current.audioVolume ?? 0.8) * 100)}%</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="confirm-dialog-buttons">
                     <button class="action-btn confirm-cancel" data-i18n="cancelText">取消</button>
@@ -293,6 +300,29 @@ const uiController = (() => {
         };
         updateBufferEnabled();
         toggle.on("change", updateBufferEnabled);
+
+        // 音量滑块：实时预览（拖动即时生效）
+        const volumeSlider = dialog.find("#volume-slider");
+        const volumeValue = dialog.find("#volume-value");
+        const fillSlider = () => {
+            const v = parseInt(volumeSlider.val(), 10);
+            volumeSlider.css("background", `linear-gradient(to right, var(--primary-color) 0%, var(--primary-color) ${v}%, #e0e0e0 ${v}%, #e0e0e0 100%)`);
+        };
+        const previewAudioVolume = (percent) => {
+            if (typeof audioHandler === "undefined") return;
+            const v = percent / 100;
+            const a = audioHandler.getAudioElement?.();
+            const p = audioHandler.getPreviewAudioElement?.();
+            if (a) a.volume = v;
+            if (p) p.volume = v;
+        };
+        fillSlider();
+        volumeSlider.on("input", function () {
+            const v = parseInt(this.value, 10);
+            volumeValue.text(v + "%");
+            fillSlider();
+            previewAudioVolume(v);
+        });
 
         // 模态框内 data-i18n 元素的局部翻译
         if (typeof languageController !== "undefined" && typeof languageController.getText === "function") {
@@ -317,12 +347,15 @@ const uiController = (() => {
             const swap = dialog.find("#swap-arrow-toggle").prop("checked");
             let delay = parseInt(dialog.find("#back-delay-input").val(), 10);
             if (!Number.isFinite(delay) || delay < 0) delay = 200;
+            let vol = parseInt(volumeSlider.val(), 10);
+            if (!Number.isFinite(vol) || vol < 0) vol = 80;
             if (typeof lyricHandler !== "undefined" && typeof lyricHandler.setMarkSettings === "function") {
                 lyricHandler.setMarkSettings({
                     bindTimeOnBack: bind,
                     bufferTime: buf,
                     swapArrowKeys: swap,
                     backDelay: delay,
+                    audioVolume: vol / 100,
                 });
             }
             close();

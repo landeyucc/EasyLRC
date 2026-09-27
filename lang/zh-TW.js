@@ -125,9 +125,10 @@ const zh_TW = {
 
   mark_settings: "標記設定",
   bind_time_on_back: "回退時綁定音訊時間",
-  buffer_time_on_back: "退回緩衝時間（秒）",
+  buffer_time_on_back: "回退緩衝時間（秒）",
   swap_arrow_keys: "使用小鍵盤前進撤銷（交換方向鍵功能）",
   back_delay_ms: "回退按鈕延遲（毫秒）",
+  audio_volume: "全局音訊音量",
   prev_lyric_char: "上一字",
   next_lyric_char: "下一字",
   prev_lyric_text: "上一歌詞: ",

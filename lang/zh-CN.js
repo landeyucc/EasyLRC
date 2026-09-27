@@ -125,9 +125,10 @@ const zh_CN = {
 
   mark_settings: "标记设置",
   bind_time_on_back: "回退时绑定音频时间",
-  buffer_time_on_back: "退回缓冲时间（秒）",
+  buffer_time_on_back: "回退缓冲时间（秒）",
   swap_arrow_keys: "使用小键盘前进撤销（交换方向键功能）",
   back_delay_ms: "回退按钮延迟（毫秒）",
+  audio_volume: "全局音频音量",
   prev_lyric_char: "上一字",
   next_lyric_char: "下一字",
   prev_lyric_text: "上一歌词: ",

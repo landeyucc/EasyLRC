@@ -144,5 +144,4 @@ This project is open-sourced under the MIT License. Please refer to the `LICENSE
 
 This project initially received inspiration from the [lrc_editor](https://github.com/yiyizym/lrc_editor) project. I would like to express my gratitude to this project for providing me with the inspiration and ideas that helped me develop this project.
 
-Thanks to [@hetai9z](https://github.com/hetai9z) for their [suggestion](https://github.com/landeyucc/EasyLRC/issues/1), which helped me improve and optimize the project in version 26.3.18.
-Thanks to [@JavaCoffeePro](https://github.com/JavaCoffeePro) for their [suggestion](https://github.com/landeyucc/EasyLRC/issues/2), which helped me improve and optimize the project in version 26.9.08.
+Thanks to [@hetai9z](https://github.com/hetai9z), [@JavaCoffeePro](https://github.com/JavaCoffeePro) and [Viomeat](https://github.com/Viomeat) for their [suggestions](https://github.com/landeyucc/EasyLRC/issues/) on this project.

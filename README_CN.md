@@ -145,5 +145,5 @@ EasyLRC 是一个基于 Web 的应用，无需复杂的安装步骤。您可以�
 
 本项目最初的灵感来自于 [lrc_editor](https://github.com/yiyizym/lrc_editor) 项目，感谢此项目为本人提供灵感，本项目完全重构不涉及他人作品。
 
-感谢来自 [@hetai9z](https://github.com/hetai9z) 的[建议](https://github.com/landeyucc/EasyLRC/issues/1)，本项目在其26.3.18版本对提出的建议进行了完善和优化。
-感谢来自 [@JavaCoffeePro](https://github.com/JavaCoffeePro) 的[建议](https://github.com/landeyucc/EasyLRC/issues/2)，本项目在其26.9.08版本对提出的建议进行了完善和优化。
+感谢来自 [@hetai9z](https://github.com/hetai9z) 、[@JavaCoffeePro](https://github.com/JavaCoffeePro) 、[Viomeat](https://github.com/Viomeat) 的[建议](https://github.com/landeyucc/EasyLRC/issues/) 对本项目提出建议。
+

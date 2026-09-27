@@ -5,6 +5,104 @@ $(document).ready(() => {
 
   lyricHandler.renderLyricPreview();
 
+  // 左侧参数面板折叠/展开动画（JS 显式像素宽度，子元素不重排只裁剪）
+  let panelAnimTimer = null;
+  let btnRestingRect = null; // 折叠按钮在完整面板中的稳定视口位置
+
+  function pinCollapseBtnFixed(collapseBtn) {
+    const rect = btnRestingRect || collapseBtn.getBoundingClientRect();
+    btnRestingRect = rect;
+    collapseBtn.style.position = "fixed";
+    collapseBtn.style.left = rect.left + "px";
+    collapseBtn.style.top = rect.top + "px";
+    collapseBtn.style.right = "auto";
+  }
+
+  function unpinCollapseBtn(collapseBtn) {
+    collapseBtn.style.position = "";
+    collapseBtn.style.left = "";
+    collapseBtn.style.top = "";
+    collapseBtn.style.right = "";
+  }
+
+  function animateInputPanel(collapse) {
+    const panel = document.getElementById("input-panel");
+    const expandBtn = document.getElementById("expand-input-panel-btn");
+    const collapseBtn = document.getElementById("collapse-input-panel-btn");
+    const mainEl = document.querySelector("main");
+    if (!panel || !mainEl) return;
+
+    const isCollapsed = panel.classList.contains("collapsed");
+    if (collapse === isCollapsed && !panel.classList.contains("panel-animating")) return;
+    if (panelAnimTimer) {
+      clearTimeout(panelAnimTimer);
+      panelAnimTimer = null;
+    }
+
+    if (collapse) {
+      const startW = panel.getBoundingClientRect().width;
+      panel.style.setProperty("--anim-w", startW + "px");
+      panel.classList.add("panel-animating");
+      panel.classList.add("is-closing");
+      mainEl.classList.add("input-panel-collapsed");
+      panel.style.width = startW + "px";
+      // 折叠按钮固定在稳定视口位置淡出，不随收缩的面板边缘移动
+      if (collapseBtn) {
+        pinCollapseBtnFixed(collapseBtn);
+        collapseBtn.classList.add("btn-faded");
+      }
+      // 强制 reflow，确保从当前宽度开始过渡
+      void panel.offsetWidth;
+      panel.style.width = "0px";
+
+      panelAnimTimer = setTimeout(() => {
+        panel.classList.remove("panel-animating", "is-closing");
+        panel.classList.add("collapsed");
+        panel.style.width = "";
+        panel.style.removeProperty("--anim-w");
+        // 折叠按钮复位为面板内 absolute（面板已 0 宽，不可见；保留缓存位置供反向操作）
+        if (collapseBtn) unpinCollapseBtn(collapseBtn);
+        // 折叠完成后展开按钮才淡入
+        if (expandBtn) expandBtn.classList.remove("hidden");
+        panelAnimTimer = null;
+      }, 340);
+    } else {
+      // 展开按钮立即淡出
+      if (expandBtn) expandBtn.classList.add("hidden");
+      // 先让面板恢复最终布局（关闭过渡），测量目标宽度，再回到 0 做展开动画
+      panel.classList.remove("collapsed", "is-closing");
+      panel.style.transition = "none";
+      panel.style.width = "auto";
+      mainEl.classList.remove("input-panel-collapsed");
+      const endW = panel.getBoundingClientRect().width;
+
+      panel.style.width = "0px";
+      panel.style.setProperty("--anim-w", endW + "px");
+      panel.classList.add("panel-animating");
+      void panel.offsetWidth; // reflow
+      panel.style.transition = "";
+      panel.style.width = endW + "px";
+      // 折叠按钮在展开过程中固定在缓存的稳定位置保持淡出
+      if (collapseBtn) {
+        pinCollapseBtnFixed(collapseBtn);
+        collapseBtn.classList.add("btn-faded");
+      }
+
+      panelAnimTimer = setTimeout(() => {
+        panel.classList.remove("panel-animating");
+        panel.style.width = "";
+        panel.style.removeProperty("--anim-w");
+        // 展开完成：按钮复位到面板右上角并淡入，清除位置缓存
+        if (collapseBtn) {
+          unpinCollapseBtn(collapseBtn);
+          collapseBtn.classList.remove("btn-faded");
+        }
+        btnRestingRect = null;
+        panelAnimTimer = null;
+      }, 340);
+    }
+  }
+
   if (
     typeof audioHandler !== "undefined" &&
     audioHandler.updatePlayButtonsState
@@ -30,7 +128,24 @@ $(document).ready(() => {
     const THRESHOLD = isMobile ? MOBILE_THRESHOLD : DESKTOP_THRESHOLD;
     let ticking = false;
 
+    // 检测页面是否有可滚动空间
+    const isPageScrollable = () => {
+      const d = document.documentElement;
+      const scrollableHeight = d.scrollHeight - window.innerHeight;
+      // scrollableHeight > 4px 才算可滚动（留像素误差）
+      if (scrollableHeight <= 4) return false;
+      // 特殊设备兜底：如果 window.scrollMaxY 可用且为 0，认为不可滚
+      if (typeof window.scrollMaxY === "number" && window.scrollMaxY <= 0) return false;
+      return true;
+    };
+
     const update = () => {
+      if (!isPageScrollable()) {
+        // 页面不可滚动（内容不够长、或特殊设备禁滚动）→ 始终显示按钮
+        btn.classList.add("is-visible");
+        ticking = false;
+        return;
+      }
       const scrolled = window.scrollY || document.documentElement.scrollTop || 0;
       btn.classList.toggle("is-visible", scrolled >= THRESHOLD);
       ticking = false;
@@ -45,6 +160,15 @@ $(document).ready(() => {
         ticking = true;
       }
     }, { passive: true });
+
+    // resize 时重新检测（屏幕旋转、窗口缩放可能改变可滚动空间）
+    window.addEventListener("resize", update, { passive: true });
+
+    // DOM 结构变化时重检（歌词加载/分割导致内容长度变化）
+    const observer = new MutationObserver(() => {
+      requestAnimationFrame(update);
+    });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 
     update();
   })();
@@ -408,36 +532,16 @@ $(document).ready(() => {
       const isMobile = window.innerWidth <= 768;
       if (!isMobile) {
         const inputPanel = document.getElementById("input-panel");
-        const expandBtn = document.getElementById("expand-input-panel-btn");
-        if (inputPanel && expandBtn) {
+        if (inputPanel) {
           const isCollapsed = inputPanel.classList.contains("collapsed");
-          if (isCollapsed) {
-            inputPanel.classList.remove("collapsed");
-            expandBtn.classList.add("hidden");
-            document
-              .querySelector("main")
-              .classList.remove("input-panel-collapsed");
-            uiController.showMessage({
-              message:
-                languageController.getText("key_left_panel_expanded") ||
-                "已展开左侧面板",
-              type: "info",
-              duration: 2000,
-            });
-          } else {
-            inputPanel.classList.add("collapsed");
-            expandBtn.classList.remove("hidden");
-            document
-              .querySelector("main")
-              .classList.add("input-panel-collapsed");
-            uiController.showMessage({
-              message:
-                languageController.getText("key_left_panel_collapsed") ||
-                "已折叠左侧面板",
-              type: "info",
-              duration: 2000,
-            });
-          }
+          animateInputPanel(!isCollapsed);
+          uiController.showMessage({
+            message: isCollapsed
+              ? languageController.getText("key_left_panel_expanded") || "已展开左侧面板"
+              : languageController.getText("key_left_panel_collapsed") || "已折叠左侧面板",
+            type: "info",
+            duration: 2000,
+          });
         }
       }
     }
@@ -574,17 +678,11 @@ $(document).ready(() => {
 
     if (collapseBtn && expandBtn && inputPanel) {
       collapseBtn.addEventListener("click", function () {
-        inputPanel.classList.add("collapsed");
-        expandBtn.classList.remove("hidden");
-        document.querySelector("main").classList.add("input-panel-collapsed");
+        animateInputPanel(true);
       });
 
       expandBtn.addEventListener("click", function () {
-        inputPanel.classList.remove("collapsed");
-        expandBtn.classList.add("hidden");
-        document
-          .querySelector("main")
-          .classList.remove("input-panel-collapsed");
+        animateInputPanel(false);
       });
     }
   }
@@ -596,8 +694,26 @@ $(document).ready(() => {
     const expandBtn = document.getElementById("expand-input-panel-btn");
 
     if (isMobileNow) {
-      if (inputPanel) inputPanel.classList.remove("collapsed");
-      if (collapseBtn) collapseBtn.style.display = "none";
+      if (panelAnimTimer) {
+        clearTimeout(panelAnimTimer);
+        panelAnimTimer = null;
+      }
+      btnRestingRect = null;
+      if (inputPanel) {
+        inputPanel.classList.remove("collapsed", "panel-animating", "is-closing");
+        inputPanel.style.width = "";
+        inputPanel.style.transition = "";
+        inputPanel.style.removeProperty("--anim-w");
+        document.querySelector("main")?.classList.remove("input-panel-collapsed");
+      }
+      if (collapseBtn) {
+        collapseBtn.classList.remove("btn-faded");
+        collapseBtn.style.position = "";
+        collapseBtn.style.left = "";
+        collapseBtn.style.top = "";
+        collapseBtn.style.right = "";
+        collapseBtn.style.display = "none";
+      }
       if (expandBtn) expandBtn.classList.add("hidden");
     } else if (collapseBtn && expandBtn && inputPanel) {
       collapseBtn.style.display = "flex";

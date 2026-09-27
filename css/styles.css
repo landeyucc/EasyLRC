@@ -505,6 +505,60 @@ input:checked + .slider:before {
   cursor: not-allowed;
 }
 
+/* 音量滑块 */
+.volume-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.volume-slider-wrap input[type="range"] {
+  flex: 1;
+  height: 6px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(to right, var(--primary-color) 0%, var(--primary-color) 80%, #e0e0e0 80%, #e0e0e0 100%);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider-wrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.volume-slider-wrap input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.volume-slider-wrap input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.volume-value {
+  min-width: 42px;
+  text-align: right;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-color-secondary, #666);
+}
+
 /* 逐字/单词时间编辑模态框 */
 .char-edit-dialog-content {
   max-width: 680px;
@@ -681,6 +735,7 @@ header p {
 main {
   display: flex;
   gap: 30px;
+  transition: gap 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 main.input-panel-collapsed {
@@ -689,30 +744,50 @@ main.input-panel-collapsed {
 
 /* 面板样式 */
 .input-panel {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
   position: relative;
-  transition: all 0.3s ease;
+  transition: width 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 动画进行中 / 折叠静止态：宽度由显式像素值或 0 驱动，不再参与 flex 分配 */
+.input-panel.panel-animating,
+.input-panel.collapsed {
+  flex: 0 0 auto;
+  overflow: hidden;
 }
 
 .input-panel.collapsed {
-  flex: 0 0 0;
-  min-width: 0;
-  max-width: 0;
   width: 0;
-  height: 0;
-  max-height: 0;
-  overflow: hidden;
+  min-width: 0;
   padding: 0;
   margin: 0;
-  gap: 0;
-  border: none;
 }
 
-.input-panel.collapsed > * {
-  display: none;
+/* 动画期间锁定子元素宽度，防止收缩时文字/卡片重排，只做裁剪（折叠按钮除外） */
+.input-panel.panel-animating > *:not(.collapse-panel-btn) {
+  min-width: var(--anim-w, auto);
+  box-sizing: border-box;
+}
+
+/* 折叠过程中子元素淡出（折叠按钮单独控制，不参与） */
+.input-panel.is-closing > *:not(.collapse-panel-btn) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.input-panel > * {
+  transition: opacity 0.25s ease;
+}
+
+.input-panel > .collapse-panel-btn {
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease,
+    opacity 0.2s ease;
 }
 
 .collapse-panel-btn {
@@ -729,9 +804,22 @@ main.input-panel-collapsed {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease,
+    opacity 0.2s ease;
   z-index: 10;
   opacity: 1;
+}
+
+.collapse-panel-btn.btn-faded {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.collapse-panel-btn.btn-faded:hover {
+  transform: none;
+  background-color: var(--primary-color);
 }
 
 .collapse-panel-btn:hover {
@@ -756,15 +844,27 @@ main.input-panel-collapsed {
   justify-content: center;
   font-size: 18px;
   transition:
-    all 0.3s ease,
-    opacity 0.3s ease;
+    opacity 0.28s ease,
+    visibility 0.28s ease,
+    background-color 0.3s ease,
+    transform 0.3s ease;
   z-index: 100;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   opacity: 0;
+  visibility: hidden;
+}
+
+/* 覆盖全局 display:none 的 .hidden，让悬浮展开按钮可以淡入淡出 */
+.expand-panel-btn.hidden {
+  display: flex !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .expand-panel-btn:not(.hidden) {
   opacity: 1;
+  visibility: visible;
 }
 
 .expand-panel-btn:hover {
@@ -1035,13 +1135,33 @@ input[type="file"] {
   cursor: not-allowed !important;
 }
 
+#timing-controls {
+  position: relative;
+}
+
 #timing-controls h2 {
-  display: inline-block;
+  display: block;
 }
 
 #mark-settings-btn {
-  float: right;
-  margin-top: 2px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 15px;
+  transition: all 0.25s ease;
+}
+
+#mark-settings-btn:hover {
+  background-color: var(--primary-color-dark, #357abd);
+  transform: scale(1.15) rotate(30deg);
+}
+
+#mark-settings-btn:active {
+  transform: scale(0.95) rotate(60deg);
 }
 
 .icon-btn {
@@ -1278,9 +1398,10 @@ input[type="file"] {
 .nav-divider {
   display: inline-block;
   width: 1px;
-  height: 24px;
+  flex: 0 0 auto;
+  align-self: stretch;
+  min-height: 36px;
   background-color: var(--border-color, #dcdcdc);
-  align-self: center;
   margin: 0 4px;
 }
 
@@ -1590,6 +1711,11 @@ input[type="file"] {
 
   .input-panel.collapsed {
     display: flex !important;
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
   }
 }
 

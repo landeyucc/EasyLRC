@@ -129,6 +129,7 @@ const en_US = {
   buffer_time_on_back: "Buffer time (seconds)",
   swap_arrow_keys: "Swap arrow keys (up/down ↔ left/right)",
   back_delay_ms: "Back button delay (ms)",
+  audio_volume: "Audio volume",
   prev_lyric_char: "Prev Char",
   next_lyric_char: "Next Char",
   prev_lyric_text: "LEFT LRC :",

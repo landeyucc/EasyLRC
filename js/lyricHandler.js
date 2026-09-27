@@ -102,6 +102,7 @@ const lyricHandler = (() => {
     bufferTime: 0,
     swapArrowKeys: false,
     backDelay: 200,
+    audioVolume: 0.8,
   };
 
   let _seekTimer = null;
@@ -687,6 +688,16 @@ const lyricHandler = (() => {
       if (typeof opts.backDelay === "number" && opts.backDelay >= 0) {
         markSettings.backDelay = Math.max(0, Math.floor(opts.backDelay));
       }
+      if (typeof opts.audioVolume === "number") {
+        markSettings.audioVolume = Math.max(0, Math.min(1, opts.audioVolume));
+        // 同步应用到两个 audio 元素
+        if (typeof audioHandler !== "undefined") {
+          const a = audioHandler.getAudioElement?.();
+          const p = audioHandler.getPreviewAudioElement?.();
+          if (a) a.volume = markSettings.audioVolume;
+          if (p) p.volume = markSettings.audioVolume;
+        }
+      }
       try {
         localStorage.setItem(
           "easyLRC_markSettings",
@@ -713,6 +724,9 @@ const lyricHandler = (() => {
         }
         if (typeof parsed.backDelay === "number" && parsed.backDelay >= 0) {
           markSettings.backDelay = Math.max(0, Math.floor(parsed.backDelay));
+        }
+        if (typeof parsed.audioVolume === "number") {
+          markSettings.audioVolume = Math.max(0, Math.min(1, parsed.audioVolume));
         }
       }
     }
@@ -2198,4 +2212,19 @@ const lyricHandler = (() => {
     recognizeTimeCodes,
     switchToPreviewInterface,
   };
+
+  // DOM 就绪后应用保存的音量到 audio 元素
+  if (typeof document !== "undefined") {
+    const applyVolume = () => {
+      const a = typeof audioHandler !== "undefined" ? audioHandler.getAudioElement?.() : null;
+      const p = typeof audioHandler !== "undefined" ? audioHandler.getPreviewAudioElement?.() : null;
+      if (a) a.volume = markSettings.audioVolume;
+      if (p) p.volume = markSettings.audioVolume;
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", applyVolume);
+    } else {
+      applyVolume();
+    }
+  }
 })();
