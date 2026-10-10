@@ -763,8 +763,12 @@ main.input-panel-collapsed {
 .input-panel.collapsed {
   width: 0;
   min-width: 0;
+  height: 0;
+  max-height: 0;
   padding: 0;
   margin: 0;
+  gap: 0;
+  border: none;
 }
 
 /* 动画期间锁定子元素宽度，防止收缩时文字/卡片重排，只做裁剪（折叠按钮除外） */
@@ -1713,9 +1717,12 @@ input[type="file"] {
     display: flex !important;
     flex: 1 1 0 !important;
     width: auto !important;
+    height: auto !important;
+    max-height: none !important;
     min-width: 0;
     padding: 0;
     margin: 0;
+    gap: 20px;
   }
 }
 
